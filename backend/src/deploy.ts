@@ -260,22 +260,6 @@ function buildDeploymentProxyUrl(projectName: string, requestUrl?: string): stri
   const projectLabel = normalizeProjectLabel(projectName);
   const base = resolveProxyBaseUrl(requestUrl);
   if (!base) return `/deployments/${projectLabel}/`;
-
-  try {
-    const parsed = new URL(base);
-    const isLocalhost = parsed.hostname === "localhost" || parsed.hostname.endsWith(".localhost");
-    if (isLocalhost) {
-      const port = parsed.port ? `:${parsed.port}` : "";
-      return `${parsed.protocol}//${projectLabel}.localhost${port}/`;
-    }
-
-    if (BASE_DOMAIN) {
-      return `${parsed.protocol}//${projectLabel}.${BASE_DOMAIN}/`;
-    }
-  } catch {
-    // Fall through to path-based URL when parsing fails.
-  }
-
   return `${base}/deployments/${projectLabel}/`;
 }
 
