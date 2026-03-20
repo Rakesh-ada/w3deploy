@@ -15,6 +15,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "w3deploy-super-secret-key-change-m
 const PINATA_GATEWAY = process.env.PINATA_GATEWAY || "gateway.pinata.cloud";
 const PINATA_JWT = process.env.PINATA_JWT || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
+const BASE_DOMAIN = (process.env.BASE_DOMAIN || "web3deploy.me").trim().toLowerCase();
 
 export const sitesRouter = new Hono();
 
@@ -62,6 +63,10 @@ function deploymentProxyUrl(c: any, projectName: string): string {
     if (isLocalhost) {
       const port = parsed.port ? `:${parsed.port}` : "";
       return `${parsed.protocol}//${label}.localhost${port}/`;
+    }
+
+    if (BASE_DOMAIN) {
+      return `${parsed.protocol}//www.${label}.${BASE_DOMAIN}/`;
     }
   } catch {
     // Fall through to path-based URL when parsing fails.

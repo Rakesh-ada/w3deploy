@@ -26,6 +26,7 @@ const pinata = new PinataSDK({
 const JWT_SECRET = process.env.JWT_SECRET || "w3deploy-super-secret-key-change-me";
 const PINATA_GATEWAY = process.env.PINATA_GATEWAY || "gateway.pinata.cloud";
 const BACKEND_URL = process.env.BACKEND_URL || "";
+const BASE_DOMAIN = (process.env.BASE_DOMAIN || "web3deploy.me").trim().toLowerCase();
 const TEMP_ROOT = path.join(os.tmpdir(), "w3deploy");
 const BUILD_OUTPUT_CANDIDATES = ["dist", "out", "build", ".next/static", ".next"] as const;
 
@@ -265,6 +266,10 @@ function buildDeploymentProxyUrl(projectName: string, requestUrl?: string): stri
     if (isLocalhost) {
       const port = parsed.port ? `:${parsed.port}` : "";
       return `${parsed.protocol}//${projectLabel}.localhost${port}/`;
+    }
+
+    if (BASE_DOMAIN) {
+      return `${parsed.protocol}//www.${projectLabel}.${BASE_DOMAIN}/`;
     }
   } catch {
     // Fall through to path-based URL when parsing fails.

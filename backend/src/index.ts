@@ -11,17 +11,29 @@ import { sitesRouter } from "./sites.js";
 import { ensureDatabase } from "./db.js";
 
 const app = new Hono();
+const BASE_DOMAIN = (process.env.BASE_DOMAIN || "web3deploy.me").trim().toLowerCase();
 
 app.use("/*", cors());
 
 function projectFromHost(hostHeader?: string): string | null {
   if (!hostHeader) return null;
   const hostname = hostHeader.split(":")[0].toLowerCase();
-  if (!hostname.endsWith(".localhost")) return null;
-  if (hostname === "localhost") return null;
+  if (!hostname) return null;
 
-  const rawPrefix = hostname.slice(0, -".localhost".length);
-  const project = rawPrefix.split(".")[0];
+  // Local dev support: <project>.localhost
+  if (hostname.endsWith(".localhost") && hostname !== "localhost") {
+    const rawPrefix = hostname.slice(0, -".localhost".length);
+    const project = rawPrefix.split(".")[0];
+    return project || null;
+  }
+
+  // Production support: www.<project>.<base-domain>
+  const prefix = `www.`;
+  const suffix = `.${BASE_DOMAIN}`;
+  if (!hostname.startsWith(prefix) || !hostname.endsWith(suffix)) return null;
+
+  const withoutPrefix = hostname.slice(prefix.length);
+  const project = withoutPrefix.slice(0, -suffix.length);
   if (!project) return null;
 
   return project;
