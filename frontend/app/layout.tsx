@@ -24,12 +24,13 @@ const bitcountPropDoubleInk = Bitcount_Prop_Double_Ink({
   subsets: ["latin"],
   weight: ["400"],
   display: "swap",
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
-  title: "D3PLOY - Web3 Vercel",
+  title: "W3DEPLOY - Web3 Vercel",
   description:
-    "A censorship-resistant deployment platform where sites live on IPFS, resolve through ENS, and cannot be governed by any single entity.",
+    "A censorship-resistant deployment platform where sites live on IPFS. Deploy directly via MCP connection to w3deploy. No servers. No censorship. Unstoppable.",
 };
 
 export default function RootLayout({

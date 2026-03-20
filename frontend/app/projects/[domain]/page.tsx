@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getToken, clearToken, getSite, getSiteIPNS, SiteDetail, IPNSEntry } from "@/lib/api";
+import { getToken, clearToken, getSite, SiteDetail } from "@/lib/api";
 import Navbar from "@/components/navbar";
-
-const DEMO_RECEIPT_KEY = "d3ploy_demo_last_receipt";
-const DEMO_DOMAIN = "d3ploy.pushx.eth";
 
 function timeStr(ts: number) {
   return new Date(ts * 1000).toLocaleString(undefined, {
@@ -21,68 +18,12 @@ function shortCid(cid: string) {
   return cid.length > 18 ? `${cid.slice(0, 9)}…${cid.slice(-8)}` : cid;
 }
 
-function buildDemoState(domain: string): { site: SiteDetail; ipns: IPNSEntry } | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(DEMO_RECEIPT_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as {
-      domain?: string;
-      cid?: string;
-      env?: string;
-      meta?: string;
-      timestamp?: number;
-      deployer?: string;
-      gatewayUrl?: string;
-      ipns?: { key?: string };
-    };
-    const demoDomain = parsed.domain || DEMO_DOMAIN;
-    if (!parsed.cid || domain !== demoDomain) return null;
-
-    const ts = parsed.timestamp || Math.floor(Date.now() / 1000);
-    const deploy = {
-      cid: parsed.cid,
-      deployer: parsed.deployer || "0x9A67D0fFe7B1C67f4b4E51e5E45E38f8dA6f8f25",
-      env: parsed.env || "production",
-      meta: parsed.meta || "Pitch demo deployment",
-      timestamp: ts,
-      url: parsed.gatewayUrl || `https://ipfs.io/ipfs/${parsed.cid}`,
-    };
-
-    return {
-      site: {
-        domain,
-        count: 1,
-        latest: deploy,
-        history: [deploy],
-      },
-      ipns: {
-        domain,
-        ipnsKey: parsed.ipns?.key || "k51qzi5uqu5d-demo-key",
-        latestCid: parsed.cid,
-        latestSeq: 1,
-        registeredAt: ts,
-        updatedAt: ts,
-        active: true,
-        gateways: [
-          `https://ipfs.io/ipns/${parsed.ipns?.key || "k51qzi5uqu5d-demo-key"}`,
-          parsed.gatewayUrl || `https://ipfs.io/ipfs/${parsed.cid}`,
-        ],
-        url: parsed.gatewayUrl || `https://ipfs.io/ipfs/${parsed.cid}`,
-      },
-    };
-  } catch {
-    return null;
-  }
-}
-
 export default function ProjectPage() {
   const router = useRouter();
   const { domain: rawDomain } = useParams<{ domain: string }>();
   const domain = decodeURIComponent(rawDomain);
 
   const [site, setSite] = useState<SiteDetail | null>(null);
-  const [ipns, setIpns] = useState<IPNSEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,36 +40,17 @@ export default function ProjectPage() {
     async function load() {
       try {
         setLoading(true);
-        const [siteRes, ipnsRes] = await Promise.allSettled([
-          getSite(domain),
-          getSiteIPNS(domain),
-        ]);
+        const siteRes = await getSite(domain);
+        setSite(siteRes);
 
-        if (siteRes.status === "fulfilled") setSite(siteRes.value);
-        else {
-          const err = siteRes.reason as Error;
-          if (err.message.includes("401") || err.message.includes("Authentication")) {
-            clearToken();
-            router.replace("/login");
-            return;
-          }
-          const demo = buildDemoState(domain);
-          if (demo) {
-            setSite(demo.site);
-            setIpns(demo.ipns);
-            setError(null);
-          } else {
-            setError(err.message);
-          }
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to load project";
+        if (errorMessage.includes("401") || errorMessage.includes("Authentication")) {
+          clearToken();
+          router.replace("/login");
+          return;
         }
-
-        if (ipnsRes.status === "fulfilled") setIpns(ipnsRes.value);
-        else {
-          const demo = buildDemoState(domain);
-          if (demo) {
-            setIpns(demo.ipns);
-          }
-        }
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -145,16 +67,11 @@ export default function ProjectPage() {
         {/* Back + title */}
         <div className="flex items-center justify-between">
           <div>
-            <Link href="/dashboard" className="text-tg-muted text-sm hover:text-white transition-colors">
-              ← Dashboard
-            </Link>
-            <h1 className="font-mono text-4xl font-extrabold mt-2">{domain}</h1>
+            <h1 className="font-mono text-4xl font-extrabold">{domain}</h1>
           </div>
-          {site && (
-            <span className="inline-flex items-center px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase bg-tg-lime/10 text-tg-lime border border-tg-lime/20">
-              {site.count} {site.count === 1 ? "deploy" : "deploys"}
-            </span>
-          )}
+          <Link href="/dashboard" className="text-tg-muted text-sm hover:text-white transition-colors">
+            Back To Dashboard
+          </Link>
         </div>
 
         {loading ? (
@@ -167,77 +84,14 @@ export default function ProjectPage() {
         ) : error ? (
           <div className="rounded-card bg-red-500/10 border border-red-500/20 p-8 text-center">
             <p className="text-red-400 text-sm">{error}</p>
-            <Link href="/dashboard" className="mt-4 inline-block text-tg-lavender text-sm hover:underline">← Back to dashboard</Link>
+            <Link href="/dashboard" className="mt-4 inline-block text-tg-lavender text-sm hover:underline">Back To Dashboard</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-            {/* IPNS Info Card */}
-            <div className="md:col-span-5 rounded-card bg-tg-gray border border-white/5 p-8 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="font-display text-xl font-bold">IPNS Status</h2>
-                {ipns ? (
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${
-                    ipns.active
-                      ? "bg-tg-lime/10 text-tg-lime border-tg-lime/20"
-                      : "bg-red-500/10 text-red-400 border-red-500/20"
-                  }`}>
-                    {ipns.active ? "Active" : "Inactive"}
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/5 text-tg-muted border border-white/10">
-                    Not registered
-                  </span>
-                )}
-              </div>
-
-              {ipns ? (
-                <div className="space-y-3">
-                  <InfoRow label="IPNS Key" value={shortCid(ipns.ipnsKey)} mono />
-                  <InfoRow label="Latest CID" value={shortCid(ipns.latestCid)} mono />
-                  <InfoRow label="Sequence" value={String(ipns.latestSeq)} />
-                  <InfoRow label="Registered" value={timeStr(ipns.registeredAt)} />
-                  <InfoRow label="Updated" value={timeStr(ipns.updatedAt)} />
-
-                  {ipns.gateways.length > 0 && (
-                    <div className="pt-2 space-y-1">
-                      <span className="text-xs font-bold tracking-widest uppercase text-tg-muted">Gateways</span>
-                      {ipns.gateways.map((gw) => (
-                        <a
-                          key={gw}
-                          href={gw}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block text-xs font-mono text-tg-lavender truncate hover:underline"
-                        >
-                          {gw}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-
-                  <a
-                    href={ipns.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 w-full flex items-center justify-center space-x-2 bg-tg-lavender text-tg-black px-5 py-3 rounded-full font-bold text-xs tracking-wide hover:opacity-90 transition-all"
-                  >
-                    <span>OPEN ON IPFS</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                </div>
-              ) : (
-                <p className="text-tg-muted text-sm">
-                  This domain is not yet registered in the IPNS registry. Complete a deployment to register it.
-                </p>
-              )}
-            </div>
-
             {/* Latest Deploy Summary */}
             {site?.latest && (
-              <div className="md:col-span-7 rounded-card bg-tg-lavender p-8 text-tg-black flex flex-col justify-between">
+              <div className="md:col-span-12 rounded-card bg-tg-lavender p-8 text-tg-black flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-tg-black/60 text-xs font-bold tracking-widest uppercase">Latest Deployment</span>
@@ -346,11 +200,3 @@ export default function ProjectPage() {
   );
 }
 
-function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="flex justify-between items-center py-1 border-b border-white/5">
-      <span className="text-xs font-bold tracking-widest uppercase text-tg-muted">{label}</span>
-      <span className={`text-sm text-right ${mono ? "font-mono text-xs" : ""}`}>{value}</span>
-    </div>
-  );
-}

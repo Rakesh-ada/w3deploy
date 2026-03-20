@@ -3,8 +3,7 @@ const API_BASE: string =
 const AUTH_BASE: string =
   process.env.NEXT_PUBLIC_AUTH_API_URL ?? API_BASE;
 
-// ── Token helpers ─────────────────────────────────────────────────────────────
-
+// Token helpers
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("d3ploy_token");
@@ -42,8 +41,7 @@ export function isTokenExpired(token?: string | null): boolean {
   return Date.now() >= expiry;
 }
 
-// ── Core fetch wrapper ────────────────────────────────────────────────────────
-
+// Core fetch wrapper
 async function apiFetch<T = unknown>(
   path: string,
   opts: RequestInit = {}
@@ -82,8 +80,7 @@ function normalizeLabel(input: string): string {
   return trimmed.split(".")[0];
 }
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
-
+// Auth
 export interface User {
   sub: string;
   provider: string;
@@ -124,8 +121,7 @@ export async function getAuthProviders(): Promise<{ providers: AuthProvider[] }>
   return apiFetchFrom(AUTH_BASE, "/api/auth/providers");
 }
 
-// ── Sites ─────────────────────────────────────────────────────────────────────
-
+// Sites
 export interface Deploy {
   cid: string;
   deployer: string;
@@ -140,18 +136,6 @@ export interface SiteDetail {
   count: number;
   latest: Deploy | null;
   history: Deploy[];
-}
-
-export interface IPNSEntry {
-  domain: string;
-  ipnsKey: string;
-  latestCid: string;
-  latestSeq: number;
-  registeredAt: number;
-  updatedAt: number;
-  active: boolean;
-  gateways: string[];
-  url: string;
 }
 
 export async function getSites(): Promise<{ domains: string[] }> {
@@ -176,12 +160,19 @@ export async function getSite(domain: string): Promise<SiteDetail> {
   }
 }
 
-export async function getSiteIPNS(domain: string): Promise<IPNSEntry> {
-  return apiFetch(`/api/sites/${encodeURIComponent(domain)}/ipns`);
+export async function deleteSite(domain: string): Promise<{
+  ok: boolean;
+  domain: string;
+  deletedDeployments: number;
+  unpinned: number;
+  unpinErrors: string[];
+}> {
+  return apiFetch(`/api/sites/${encodeURIComponent(domain)}`, {
+    method: "DELETE",
+  });
 }
 
-// ── Deploy ────────────────────────────────────────────────────────────────────
-
+// Deploy
 export interface DeployStatus {
   active: number;
   max: number;
@@ -194,57 +185,16 @@ export async function getDeployStatus(): Promise<DeployStatus> {
 export interface DeployReceipt {
   domain: string;
   cid: string;
-  ipnsKey?: string;
-  ens?: {
-    mode?: "auto" | "custom";
-    name?: string;
-    contenthash?: string | null;
-    managedBy?: "server" | "wallet";
-    status?: string;
-  };
-  ipns?: {
-    key?: string | null;
-  };
-  txHash?: string;
+  url?: string;
   gatewayUrl?: string;
+  rawGatewayUrl?: string;
   [key: string]: unknown;
-}
-
-export interface AgentIssue {
-  severity: "low" | "medium" | "high";
-  text: string;
-}
-
-export interface AgentAnalysis {
-  prompt: string;
-  framework: string;
-  compatibility: "ready" | "needs-fixes" | "needs-input";
-  confidence: "high" | "medium";
-  issues: AgentIssue[];
-  fixes: string[];
-  notes: string[];
-  detected: {
-    projectPath: string | null;
-    repoUrl: string | null;
-    hasPackageJson: boolean;
-  };
-}
-
-export interface AgentDeployPayload {
-  mode: "analysis" | "deploy";
-  analysis: AgentAnalysis;
-  deploy?: {
-    command: string;
-    cwd: string;
-    domain: string;
-    receipt: DeployReceipt | null;
-  };
 }
 
 /** Start a deploy, streaming SSE log lines back to the caller.
  *  Returns an abort function to cancel the deploy stream. */
 export function deployStream(
-  data: { repoUrl: string; domain: string; env?: string; meta?: string; domainMode?: "auto" | "custom"; ipnsKey?: string | null },
+  data: { repoUrl: string; domain: string; env?: string; meta?: string },
   onLog: (line: string) => void,
   onDone: (receipt: DeployReceipt) => void,
   onError: (message: string) => void
@@ -310,8 +260,9 @@ export function deployStream(
                 domain: (parsed as DeployReceipt).domain ?? (parsed as { label?: string }).label ?? label,
                 cid: (parsed as DeployReceipt).cid ?? (parsed as { CID?: string }).CID ?? "",
               });
+            } else if (event === "error") {
+              onError(parsed.message);
             }
-            else if (event === "error") onError(parsed.message);
           } catch {
             // ignore malformed SSE data
           }
@@ -327,94 +278,7 @@ export function deployStream(
   return () => controller.abort();
 }
 
-export function agentDeployStream(
-  data: {
-    prompt: string;
-    projectPath?: string;
-    repoUrl?: string;
-    domain?: string;
-    env?: "production" | "preview";
-    ipnsKey?: string | null;
-    analyzeOnly?: boolean;
-  },
-  onAnalysis: (analysis: AgentAnalysis) => void,
-  onLog: (line: string) => void,
-  onDone: (payload: AgentDeployPayload) => void,
-  onError: (message: string) => void
-): () => void {
-  const token = getToken();
-  const controller = new AbortController();
-
-  (async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/agent/deploy`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(data),
-        signal: controller.signal,
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "AI deploy failed" }));
-        onError(err.error || "AI deploy failed");
-        return;
-      }
-
-      const reader = res.body?.getReader();
-      if (!reader) {
-        onError("AI deploy stream unavailable");
-        return;
-      }
-
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const chunks = buffer.split("\n\n");
-        buffer = chunks.pop() ?? "";
-
-        for (const chunk of chunks) {
-          const lines = chunk.split("\n");
-          let event = "";
-          let dataStr = "";
-
-          for (const line of lines) {
-            if (line.startsWith("event: ")) event = line.slice(7).trim();
-            else if (line.startsWith("data: ")) dataStr = line.slice(6).trim();
-          }
-
-          if (!event || !dataStr) continue;
-
-          try {
-            const parsed = JSON.parse(dataStr) as AgentAnalysis | AgentDeployPayload | { line?: string; message?: string };
-            if (event === "analysis") onAnalysis(parsed as AgentAnalysis);
-            else if (event === "log" && typeof (parsed as { line?: string }).line === "string") onLog((parsed as { line: string }).line);
-            else if (event === "done") onDone(parsed as AgentDeployPayload);
-            else if (event === "error") onError((parsed as { message?: string }).message || "AI deploy failed");
-          } catch {
-            // Ignore malformed chunks.
-          }
-        }
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name !== "AbortError") {
-        onError(err.message || "AI deploy failed");
-      }
-    }
-  })();
-
-  return () => controller.abort();
-}
-
-// ── GitHub ────────────────────────────────────────────────────────────────────
-
+// GitHub
 export interface Repo {
   name: string;
   fullName: string;
@@ -431,10 +295,7 @@ export interface ConnectedRepo {
   repo: string;
   branch: string;
   domain: string;
-  domainMode: "auto" | "custom";
-  customEnsName?: string | null;
-  parentEnsName?: string | null;
-  ipnsKey?: string | null;
+  domainMode: "auto";
   env: string;
   webhookId: number | null;
   connectedBy: string;
@@ -456,64 +317,9 @@ export async function connectRepo(data: {
   repoFullName: string;
   branch: string;
   domain?: string;
-  domainMode?: "auto" | "custom";
-  customEnsName?: string;
   env: string;
 }): Promise<{ ok: boolean; key: string; webhookId: number | null; message: string; domain: string; domainMode: "auto" | "custom" }> {
   return apiFetch("/api/github/connect", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-// ── Custom ENS domains ───────────────────────────────────────────────────────
-
-export interface CustomDomainInitResponse {
-  ensName: string;
-  walletAddress: string;
-  ipnsKey: string;
-  nonce: string;
-  message: string;
-  note: string;
-}
-
-export interface CustomDomainVerifyResponse {
-  ok: boolean;
-  ensName: string;
-  walletAddress: string;
-  ipnsKey: string;
-  ensToIpnsStatus: string;
-  ensToIpnsConfigured: boolean;
-  ensToIpnsTxHash?: string;
-  note: string;
-}
-
-export async function initCustomDomainVerification(data: {
-  ensName: string;
-  walletAddress: string;
-}): Promise<CustomDomainInitResponse> {
-  return apiFetch("/api/domains/custom/init", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function verifyCustomDomainSignature(data: {
-  ensName: string;
-  walletAddress: string;
-  signature: string;
-}): Promise<CustomDomainVerifyResponse> {
-  return apiFetch("/api/domains/custom/verify", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
-}
-
-export async function confirmCustomDomainEnsLink(data: {
-  ensName: string;
-  txHash: string;
-}): Promise<{ ok: boolean; ensName: string; ensToIpnsStatus: string; ensToIpnsConfigured: boolean; ensToIpnsTxHash: string }> {
-  return apiFetch("/api/domains/custom/confirm-link", {
     method: "POST",
     body: JSON.stringify(data),
   });

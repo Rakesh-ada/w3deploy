@@ -18,8 +18,9 @@ export default function Home() {
                 Censorship-Resistant<br />Hosting
               </h1>
               <p className="mt-4 text-base font-medium opacity-80 max-w-md">
-                Deploy decentralized applications directly to IPFS and ENS with
-                millisecond latency. No servers. No censorship. Unstoppable.
+                Deploy decentralized applications directly to IPFS
+                with millisecond latency. No servers. No censorship.
+                Unstoppable.
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -41,8 +42,8 @@ export default function Home() {
 
           {/* Feature Card – IPFS */}
           <div className="md:col-span-4 rounded-card bg-tg-gray p-8 border border-white/5 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
-            <div className="w-12 h-12 rounded-2xl bg-tg-lavender/10 border border-tg-lavender/20 flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-tg-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-40 h-40 rounded-3xl bg-tg-lavender/10 border border-tg-lavender/20 flex items-center justify-center">
+              <svg className="w-36 h-36 text-tg-lavender" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
@@ -51,22 +52,6 @@ export default function Home() {
               <p className="text-tg-muted text-sm leading-relaxed">
                 Every deployment is content-addressed and pinned to IPFS. Your
                 site lives forever — no single point of failure.
-              </p>
-            </div>
-          </div>
-
-          {/* Feature Card – ENS */}
-          <div className="md:col-span-4 rounded-card bg-tg-gray p-8 border border-white/5 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
-            <div className="w-12 h-12 rounded-2xl bg-tg-lime/10 border border-tg-lime/20 flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-tg-lime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="font-display text-xl font-bold mb-2">ENS Resolution</h3>
-              <p className="text-tg-muted text-sm leading-relaxed">
-                Map your <span className="text-white font-mono">.eth</span> domain
-                directly to your IPFS deployment. Human-readable, blockchain-secured.
               </p>
             </div>
           </div>
@@ -87,6 +72,36 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Feature Card – Native MCP */}
+          <div className="md:col-span-4 rounded-card bg-tg-gray p-8 border border-white/5 flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-display text-xl font-bold mb-2">Native MCP Server</h3>
+              <p className="text-tg-muted text-sm leading-relaxed">
+                Connect your IDE to W3DEPLOY via MCP. Let your local AI assistants instantly spin up previews and push to production.
+              </p>
+            </div>
+          </div>
+
+          {/* Feature Card – Deployment History */}
+          <div className="md:col-span-4 rounded-card bg-tg-lavender p-8 flex flex-col justify-between text-tg-black transition-transform duration-200 hover:-translate-y-0.5">
+            <div className="w-12 h-12 rounded-2xl bg-tg-black/10 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-tg-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-display text-xl font-bold mb-2">Deployment History</h3>
+              <p className="text-tg-black/70 text-sm leading-relaxed">
+                Track every release with timestamps, commit hashes, and immutable CIDs so you can audit rollouts instantly.
+              </p>
+            </div>
+          </div>
+
           {/* How It Works */}
           <section className="md:col-span-12 rounded-card bg-tg-gray border border-white/5 p-8 md:p-12">
             <h2 className="font-display text-3xl font-bold mb-10">How it works</h2>
@@ -95,17 +110,17 @@ export default function Home() {
                 {
                   step: "01",
                   title: "Connect your repo",
-                  desc: "Authenticate with GitHub and link your repository. D3PLOY registers a webhook to listen for new pushes.",
+                  desc: "Authenticate with GitHub and link your repository. W3DEPLOY registers a webhook to listen for new pushes.",
                 },
                 {
                   step: "02",
                   title: "Push to deploy",
-                  desc: "On every push to your configured branch, D3PLOY builds your project and pins the output to IPFS automatically.",
+                  desc: "On every push to your configured branch, W3DEPLOY builds your project and pins the output to IPFS automatically.",
                 },
                 {
                   step: "03",
-                  title: "Resolve via ENS",
-                  desc: "Your ENS domain is updated to point to the new IPFS CID. Anyone with a compatible browser can access your site.",
+                  title: "Agent Deployment",
+                  desc: "Alternatively, use your IDE's built-in MCP to let our agents build and deploy your project automatically by chatting.",
                 },
               ].map(({ step, title, desc }) => (
                 <div key={step} className="space-y-4">
@@ -123,10 +138,10 @@ export default function Home() {
           <section className="md:col-span-12 rounded-card bg-tg-black border border-tg-lavender/20 p-8 md:p-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h2 className="font-display text-3xl font-bold">
-                Ready to go permissionless?
+                Ready to deploy with agents?
               </h2>
               <p className="text-tg-muted mt-2 text-sm">
-                Connect your GitHub and ship your first decentralised site in
+                Connect your GitHub or chat with your IDE MCP and ship your first decentralised site in
                 under 2 minutes.
               </p>
             </div>
@@ -143,7 +158,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-20 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-tg-muted text-xs font-medium">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <span>© 2024 D3PLOY FOUNDATION</span>
+            <span>© 2024 W3DEPLOY FOUNDATION</span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="hover:text-white cursor-pointer transition-colors">TERMS OF SERVICE</span>
           </div>

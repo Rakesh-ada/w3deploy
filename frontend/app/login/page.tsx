@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getToken, getLoginUrl, getGoogleLoginUrl, getAuthProviders } from "@/lib/api";
+import { getToken, saveToken, getLoginUrl, getGoogleLoginUrl, getAuthProviders } from "@/lib/api";
 import Navbar from "@/components/navbar";
 import { Suspense } from "react";
 
@@ -11,12 +11,19 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+  const tokenParam = searchParams.get("token");
   const [providers, setProviders] = useState({ github: true, google: false });
 
   useEffect(() => {
+    if (tokenParam) {
+      saveToken(tokenParam);
+      router.replace("/dashboard");
+      return;
+    }
+
     // If already logged in, redirect to dashboard
     if (getToken()) router.replace("/dashboard");
-  }, [router]);
+  }, [router, tokenParam]);
 
   useEffect(() => {
     let mounted = true;
@@ -56,7 +63,7 @@ function LoginContent() {
 
               <h1 className="font-display text-3xl font-extrabold mb-2">Welcome back</h1>
               <p className="text-tg-muted text-sm mb-8">
-                Connect your GitHub to deploy censorship-resistant apps.
+                Connect your GitHub to let agents deploy apps securely.
               </p>
 
               {/* Error banner */}
