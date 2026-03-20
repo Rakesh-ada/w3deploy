@@ -27,16 +27,20 @@ function projectFromHost(hostHeader?: string): string | null {
     return project || null;
   }
 
-  // Production support: www.<project>.<base-domain>
-  const prefix = `www.`;
+  // Production support: <project>.<base-domain> (preferred)
+  // Backward compatibility: www.<project>.<base-domain>
   const suffix = `.${BASE_DOMAIN}`;
-  if (!hostname.startsWith(prefix) || !hostname.endsWith(suffix)) return null;
+  if (!hostname.endsWith(suffix)) return null;
 
-  const withoutPrefix = hostname.slice(prefix.length);
-  const project = withoutPrefix.slice(0, -suffix.length);
-  if (!project) return null;
+  const withoutSuffix = hostname.slice(0, -suffix.length);
+  if (!withoutSuffix) return null;
 
-  return project;
+  if (withoutSuffix.startsWith("www.")) {
+    const project = withoutSuffix.slice("www.".length);
+    return project || null;
+  }
+
+  return withoutSuffix;
 }
 
 app.onError((err, c) => {
@@ -74,7 +78,7 @@ app.route("/deployments", proxyRouter);
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 8080;
 
-ensureDatabase();
+void ensureDatabase();
 
 console.log(`Server is running on http://localhost:${port}`);
 

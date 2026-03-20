@@ -16,6 +16,7 @@ import {
   canStartDeploy,
   getActiveDeployCount,
   getMaxConcurrent,
+  isValidWalletAddress,
 } from "./db.js";
 
 const pinata = new PinataSDK({
@@ -269,13 +270,24 @@ function buildDeploymentProxyUrl(projectName: string, requestUrl?: string): stri
     }
 
     if (BASE_DOMAIN) {
-      return `${parsed.protocol}//www.${projectLabel}.${BASE_DOMAIN}/`;
+      return `${parsed.protocol}//${projectLabel}.${BASE_DOMAIN}/`;
     }
   } catch {
     // Fall through to path-based URL when parsing fails.
   }
 
   return `${base}/deployments/${projectLabel}/`;
+}
+
+function normalizeWalletAddress(value: string): string {
+  return value.trim().toUpperCase();
+}
+
+function getWalletFromRequest(c: any): string | null {
+  const wallet = c.req.header("x-wallet-address") || "";
+  if (!wallet) return null;
+  if (!isValidWalletAddress(wallet)) return null;
+  return normalizeWalletAddress(wallet);
 }
 
 // ── Auth middleware ───────────────────────────────────────────────────────────
@@ -307,8 +319,12 @@ deployRouter.get("/status", (c) => {
 
 // Main deploy stream
 deployRouter.post("/stream", authMiddleware, async (c) => {
-  const user = c.get("jwtPayload") as any;
-  const userId = user?.sub || "anonymous";
+  const walletAddress = getWalletFromRequest(c);
+  if (!walletAddress) {
+    return c.json({ error: "Connect your wallet before deploying." }, 400);
+  }
+
+  const userId = walletAddress;
 
   const body = await c.req.json<DeployRequestBody>().catch(() => null);
 
@@ -438,7 +454,7 @@ deployRouter.post("/stream", authMiddleware, async (c) => {
       const repoMatch = repoUrl.match(/github\.com\/([^/]+\/[^/.]+)/);
       const repoFullName = repoMatch ? repoMatch[1] : repoUrl;
 
-      const project = upsertProject(label, userId, {
+      const project = await upsertProject(label, userId, {
         repoFullName,
         branch: "main",
         rootDirectory: meta.rootDirectory || "./",
@@ -451,7 +467,7 @@ deployRouter.post("/stream", authMiddleware, async (c) => {
         webhookId: null,
       });
 
-      addDeployment({
+      await addDeployment({
         projectId: project.id,
         domain: label,
         cid,
@@ -561,7 +577,7 @@ export async function triggerDeploy(
     const repoMatch = repoUrl.match(/github\.com\/([^/]+\/[^/.]+)/);
     const repoFullName = repoMatch ? repoMatch[1] : repoUrl;
 
-    const project = upsertProject(label, userId, {
+    const project = await upsertProject(label, userId, {
       repoFullName,
       branch: "main",
       rootDirectory: projectMeta.rootDirectory || "./",
@@ -574,7 +590,7 @@ export async function triggerDeploy(
       webhookId: null,
     });
 
-    addDeployment({
+    await addDeployment({
       projectId: project.id,
       domain: label,
       cid,

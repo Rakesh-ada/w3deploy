@@ -1,9 +1,15 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getToken, clearToken, getSite, SiteDetail } from "@/lib/api";
+import { useParams, useRouter } from "next/navigation";
+import { useAccount, useConnect } from "wagmi";
+import {
+  clearToken,
+  getSite,
+  getToken,
+  SiteDetail,
+} from "@/lib/api";
 import Navbar from "@/components/navbar";
 
 function timeStr(ts: number) {
@@ -14,57 +20,84 @@ function timeStr(ts: number) {
 }
 
 function shortCid(cid: string) {
-  if (!cid) return "—";
-  return cid.length > 18 ? `${cid.slice(0, 9)}…${cid.slice(-8)}` : cid;
+  if (!cid) return "-";
+  return cid.length > 18 ? `${cid.slice(0, 9)}...${cid.slice(-8)}` : cid;
 }
 
 export default function ProjectPage() {
   const router = useRouter();
   const { domain: rawDomain } = useParams<{ domain: string }>();
+  const { address, isConnected } = useAccount();
+  const { connectAsync, connectors, isPending: isConnectingWallet } = useConnect();
   const domain = decodeURIComponent(rawDomain);
 
   const [site, setSite] = useState<SiteDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const walletAddress = isConnected && address ? address : null;
+  const walletBusy = isConnectingWallet;
 
   useEffect(() => {
     if (!getToken()) {
       router.replace("/login");
+      return;
     }
   }, [router]);
 
   useEffect(() => {
     if (!domain) return;
     if (!getToken()) return;
+    if (!walletAddress) {
+      setLoading(false);
+      return;
+    }
 
     async function load() {
       try {
         setLoading(true);
+        setError(null);
         const siteRes = await getSite(domain);
         setSite(siteRes);
-
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : "Failed to load project";
-        if (errorMessage.includes("401") || errorMessage.includes("Authentication")) {
+        const message = err instanceof Error ? err.message : "Failed to load project";
+        if (message.includes("401") || message.includes("Authentication")) {
           clearToken();
           router.replace("/login");
           return;
         }
-        setError(errorMessage);
+        setError(message);
       } finally {
         setLoading(false);
       }
     }
 
     load();
-  }, [domain, router]);
+  }, [domain, router, walletAddress]);
+
+  async function handleConnectWallet() {
+    if (walletBusy) return;
+
+    setError(null);
+    try {
+      const connector = connectors.find((item) => item.id === "injected") ?? connectors[0];
+      if (!connector) {
+        throw new Error("No wallet connector is available.");
+      }
+      await connectAsync({ connector });
+      setLoading(true);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Wallet connection failed.";
+      if (!message.toLowerCase().includes("cancel")) {
+        setError(message);
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-tg-black text-white font-sans antialiased p-6 md:p-12">
       <main className="max-w-7xl mx-auto space-y-6">
         <Navbar />
 
-        {/* Back + title */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-mono text-4xl font-extrabold">{domain}</h1>
@@ -74,22 +107,37 @@ export default function ProjectPage() {
           </Link>
         </div>
 
-        {loading ? (
+        {!walletAddress ? (
+          <div className="rounded-card bg-tg-gray border border-white/5 p-8 text-center">
+            <h2 className="font-display text-xl font-bold mb-2">Connect your wallet</h2>
+            <p className="text-tg-muted text-sm mb-6">
+              Connect your wallet to load deployment history for this project.
+            </p>
+            <button
+              type="button"
+              onClick={handleConnectWallet}
+              disabled={walletBusy}
+              className="bg-tg-lavender text-tg-black px-6 py-3 rounded-full font-bold text-sm tracking-wide hover:opacity-90 transition-all disabled:opacity-60"
+            >
+              {walletBusy ? "CONNECTING..." : "CONNECT WALLET"}
+            </button>
+          </div>
+        ) : loading ? (
           <div className="flex items-center justify-center py-32">
             <div className="flex flex-col items-center space-y-4">
               <div className="w-8 h-8 border-2 border-tg-lavender border-t-transparent rounded-full animate-spin" />
-              <span className="text-tg-muted text-sm">Loading project…</span>
+              <span className="text-tg-muted text-sm">Loading project...</span>
             </div>
           </div>
         ) : error ? (
           <div className="rounded-card bg-red-500/10 border border-red-500/20 p-8 text-center">
             <p className="text-red-400 text-sm">{error}</p>
-            <Link href="/dashboard" className="mt-4 inline-block text-tg-lavender text-sm hover:underline">Back To Dashboard</Link>
+            <Link href="/dashboard" className="mt-4 inline-block text-tg-lavender text-sm hover:underline">
+              Back To Dashboard
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-            {/* Latest Deploy Summary */}
             {site?.latest && (
               <div className="md:col-span-12 rounded-card bg-tg-lavender p-8 text-tg-black flex flex-col justify-between">
                 <div>
@@ -126,7 +174,6 @@ export default function ProjectPage() {
               </div>
             )}
 
-            {/* Deploy History */}
             <section className="md:col-span-12 rounded-card bg-tg-gray border border-white/5 p-8">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="font-display text-2xl font-bold">Deploy History</h2>
@@ -169,11 +216,9 @@ export default function ProjectPage() {
                             </span>
                           </td>
                           <td className="py-4 font-mono text-xs text-tg-muted">
-                            {deploy.deployer ? `${deploy.deployer.slice(0, 6)}…${deploy.deployer.slice(-4)}` : "—"}
+                            {deploy.deployer ? `${deploy.deployer.slice(0, 6)}...${deploy.deployer.slice(-4)}` : "-"}
                           </td>
-                          <td className="py-4 text-sm text-tg-muted">
-                            {timeStr(deploy.timestamp)}
-                          </td>
+                          <td className="py-4 text-sm text-tg-muted">{timeStr(deploy.timestamp)}</td>
                           <td className="py-4 text-right">
                             <a
                               href={deploy.url}

@@ -3,7 +3,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getToken, clearToken, DeployReceipt, getRepos, Repo, deployStream } from "@/lib/api";
+import { useAccount, useConnect } from "wagmi";
+import {
+  getToken,
+  clearToken,
+  DeployReceipt,
+  getRepos,
+  Repo,
+  deployStream,
+} from "@/lib/api";
 import Navbar from "@/components/navbar";
 
 type DeployState = "idle" | "deploying" | "done" | "error";
@@ -48,6 +56,8 @@ function parseDotEnv(raw: string): EnvVarRow[] {
 
 export default function DeployPage() {
   const router = useRouter();
+  const { address, isConnected } = useAccount();
+  const { connectAsync, connectors, isPending: isConnectingWallet } = useConnect();
 
   const [cloneUrl, setCloneUrl] = useState("");
   const [selectedRepo, setSelectedRepo] = useState("");
@@ -58,6 +68,8 @@ export default function DeployPage() {
   const [dotEnvText, setDotEnvText] = useState("");
   const [repoMenuOpen, setRepoMenuOpen] = useState(false);
   const [repoQuery, setRepoQuery] = useState("");
+  const walletAddress = isConnected && address ? address : null;
+  const walletBusy = isConnectingWallet;
 
   const [status, setStatus] = useState<DeployState>("idle");
   const [logs, setLogs] = useState<string[]>([]);
@@ -77,6 +89,7 @@ export default function DeployPage() {
   useEffect(() => {
     if (!getToken()) {
       router.replace("/login");
+      return;
     }
   }, [router]);
 
@@ -141,8 +154,31 @@ export default function DeployPage() {
     };
   }, [repoMenuOpen]);
 
+  async function handleConnectWallet() {
+    if (walletBusy) return;
+
+    setErrMsg(null);
+    try {
+      const connector = connectors.find((item) => item.id === "injected") ?? connectors[0];
+      if (!connector) {
+        throw new Error("No wallet connector is available.");
+      }
+      await connectAsync({ connector });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Wallet connection failed.";
+      if (!message.toLowerCase().includes("cancel")) {
+        setErrMsg(message);
+      }
+    }
+  }
+
   async function handleDeploy(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!walletAddress) {
+      setErrMsg("Connect your Algorand wallet before deploying.");
+      return;
+    }
 
     if (!cloneUrl.trim()) {
       setErrMsg("Please select a GitHub repository.");
@@ -221,6 +257,22 @@ export default function DeployPage() {
 
           <div className="md:col-span-5 rounded-card bg-tg-gray border border-white/5 p-8 md:p-10">
             <h2 className="font-display text-3xl font-bold mb-7">Configuration</h2>
+
+            {!walletAddress && (
+              <div className="mb-6 px-4 py-3 rounded-2xl bg-tg-lavender/10 border border-tg-lavender/20">
+                <p className="text-sm text-tg-muted mb-3">
+                  Connect your wallet to store deployment history on-chain.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleConnectWallet}
+                  disabled={walletBusy}
+                  className="bg-tg-lavender text-tg-black px-4 py-2 rounded-full font-bold text-xs tracking-wide hover:opacity-90 transition-all disabled:opacity-60"
+                >
+                  {walletBusy ? "CONNECTING..." : "CONNECT WALLET"}
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleDeploy} className="space-y-6">
               <div className="space-y-2">
@@ -330,7 +382,8 @@ export default function DeployPage() {
                   <>
                     <button
                       type="submit"
-                      className="flex-1 bg-tg-lavender text-tg-black px-6 py-3 rounded-full font-bold text-sm tracking-wide hover:opacity-90 transition-all"
+                      disabled={!walletAddress}
+                      className="flex-1 bg-tg-lavender text-tg-black px-6 py-3 rounded-full font-bold text-sm tracking-wide hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       DEPLOY
                     </button>

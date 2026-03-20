@@ -5,6 +5,9 @@ import {
   getProjectsByRepo,
   listProjectsByUser,
   listDeploymentsByDomain,
+  listAllProjects,
+  updateProject,
+  isValidWalletAddress,
   type Project,
 } from "./db.js";
 import { triggerDeploy } from "./deploy.js";
@@ -14,6 +17,17 @@ export const githubRouter = new Hono();
 const JWT_SECRET = process.env.JWT_SECRET || "w3deploy-super-secret-key-change-me";
 const WEBHOOK_SECRET = process.env.GITHUB_WEBHOOK_SECRET || "";
 const BACKEND_URL = process.env.BACKEND_URL || "";
+
+function normalizeWalletAddress(value: string): string {
+  return value.trim().toUpperCase();
+}
+
+function getWalletFromRequest(c: any): string | null {
+  const wallet = c.req.header("x-wallet-address") || "";
+  if (!wallet) return null;
+  if (!isValidWalletAddress(wallet)) return null;
+  return normalizeWalletAddress(wallet);
+}
 
 // ── Auth Middleware ──────────────────────────────────────────────────────────
 
@@ -34,6 +48,7 @@ const authMiddleware = async (c: any, next: any) => {
 
 githubRouter.get("/repos", authMiddleware, async (c) => {
   const user = c.get("jwtPayload") as any;
+  const wallet = getWalletFromRequest(c);
   try {
     const res = await fetch("https://api.github.com/user/repos?sort=updated&per_page=100", {
       headers: {
@@ -49,7 +64,7 @@ githubRouter.get("/repos", authMiddleware, async (c) => {
     }
 
     // Get user's connected projects to mark them
-    const userProjects = listProjectsByUser(user.sub);
+    const userProjects = wallet ? await listProjectsByUser(wallet) : [];
     const connectedRepos = new Set(userProjects.map((p) => p.repoFullName));
 
     const repos = data.map((r: any) => ({
@@ -99,6 +114,11 @@ githubRouter.get("/repos/:owner/:repo/branches", authMiddleware, async (c) => {
 
 githubRouter.post("/connect", authMiddleware, async (c) => {
   const user = c.get("jwtPayload") as any;
+  const wallet = getWalletFromRequest(c);
+  if (!wallet) {
+    return c.json({ error: "Connect your wallet before linking repositories." }, 400);
+  }
+
   const body = await c.req.json();
 
   const repoFullName = body.repoFullName || "";
@@ -107,7 +127,7 @@ githubRouter.post("/connect", authMiddleware, async (c) => {
   const domainMode = body.domainMode || "auto";
 
   // Save to database
-  const project = upsertProject(domain, user.sub, {
+  const project = await upsertProject(domain, wallet, {
     repoFullName,
     branch,
     rootDirectory: body.rootDirectory || "./",
@@ -166,8 +186,7 @@ githubRouter.post("/connect", authMiddleware, async (c) => {
 
   // Update webhook ID if we managed to create one
   if (webhookId) {
-    const { upsertProject: _, updateProject } = await import("./db.js");
-    updateProject(project.id, { webhookId });
+    await updateProject(project.id, { webhookId });
   }
 
   return c.json({
@@ -185,12 +204,17 @@ githubRouter.post("/connect", authMiddleware, async (c) => {
 // ── GET /connected — List connected repos for user ───────────────────────────
 
 githubRouter.get("/connected", authMiddleware, async (c) => {
-  const user = c.get("jwtPayload") as any;
-  const projects = listProjectsByUser(user.sub);
+  const wallet = getWalletFromRequest(c);
+  if (!wallet) {
+    return c.json({ repos: [] });
+  }
 
-  const repos = projects.map((p) => {
+  const projects = await listProjectsByUser(wallet);
+
+  const repos = await Promise.all(
+    projects.map(async (p) => {
     const [owner, repo] = p.repoFullName.split("/");
-    const deployments = listDeploymentsByDomain(p.domain);
+    const deployments = await listDeploymentsByDomain(p.domain, wallet);
 
     return {
       repoFullName: p.repoFullName,
@@ -202,7 +226,7 @@ githubRouter.get("/connected", authMiddleware, async (c) => {
       ipnsKey: null,
       env: p.env,
       webhookId: p.webhookId,
-      connectedBy: p.userId,
+      connectedBy: wallet,
       recentDeploys: deployments.slice(0, 5).map((d) => ({
         cid: d.cid,
         deployer: d.deployer,
@@ -212,7 +236,8 @@ githubRouter.get("/connected", authMiddleware, async (c) => {
         url: d.url,
       })),
     };
-  });
+    })
+  );
 
   return c.json({ repos });
 });
@@ -233,7 +258,7 @@ githubRouter.post("/webhook", async (c) => {
     console.log(`   Commit: ${commitHash?.slice(0, 8)} — ${commitMessage}`);
 
     // Look up all projects connected to this repo
-    const projects = getProjectsByRepo(repoFullName);
+    const projects = await getProjectsByRepo(repoFullName);
 
     if (projects.length === 0) {
       console.log(`   ⚠ No projects found for ${repoFullName}`);
@@ -297,19 +322,7 @@ let pollIntervalId: ReturnType<typeof setInterval> | null = null;
 
 async function pollForChanges() {
   // Poll GitHub for new commits on connected repos (public API, no auth needed for public repos)
-  const fsSync = await import("fs");
-  const pathMod = await import("path");
-
-  let db: { projects: Project[]; deployments: any[] };
-  try {
-    const dbPath = pathMod.join(process.cwd(), "data", "w3deploy-db.json");
-    const raw = fsSync.readFileSync(dbPath, "utf-8");
-    db = JSON.parse(raw);
-  } catch {
-    return; // No DB file yet
-  }
-
-  const projects: Project[] = db.projects || [];
+  const projects: Project[] = await listAllProjects();
   if (projects.length === 0) return;
 
   for (const project of projects) {

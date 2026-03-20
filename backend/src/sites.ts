@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+﻿import { Hono } from "hono";
 import { verify } from "hono/jwt";
 import { PinataSDK } from "pinata-web3";
 import {
@@ -9,6 +9,7 @@ import {
   getActiveDeployCount,
   getMaxConcurrent,
   removeProjectByDomainForUser,
+  isValidWalletAddress,
 } from "./db.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "w3deploy-super-secret-key-change-me";
@@ -36,6 +37,17 @@ function normalizeProjectLabel(value: string): string {
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "");
   return normalized || "project";
+}
+
+function normalizeWalletAddress(value: string): string {
+  return value.trim().toUpperCase();
+}
+
+function getWalletFromRequest(c: any): string | null {
+  const wallet = c.req.header("x-wallet-address") || "";
+  if (!wallet) return null;
+  if (!isValidWalletAddress(wallet)) return null;
+  return normalizeWalletAddress(wallet);
 }
 
 function getBackendBaseUrl(c: any): string {
@@ -66,7 +78,7 @@ function deploymentProxyUrl(c: any, projectName: string): string {
     }
 
     if (BASE_DOMAIN) {
-      return `${parsed.protocol}//www.${label}.${BASE_DOMAIN}/`;
+      return `${parsed.protocol}//${label}.${BASE_DOMAIN}/`;
     }
   } catch {
     // Fall through to path-based URL when parsing fails.
@@ -92,25 +104,33 @@ const authMiddleware = async (c: any, next: any) => {
   }
 };
 
-// GET /api/sites - list all domains for the authenticated user
+// GET /api/sites - list all domains for the connected wallet
 sitesRouter.get("/", authMiddleware, async (c) => {
-  const user = c.get("jwtPayload") as any;
-  const projects = listProjectsByUser(user.sub);
-  const domains = projects.map((p) => p.domain);
+  const wallet = getWalletFromRequest(c);
+  if (!wallet) {
+    return c.json({ error: "Connect your wallet to load projects." }, 400);
+  }
+
+  const projects = await listProjectsByUser(wallet);
+  const domains = projects.map((project) => project.domain);
   return c.json({ domains });
 });
 
 // GET /api/sites/:domain - project detail + deployment history
 sitesRouter.get("/:domain", authMiddleware, async (c) => {
-  const user = c.get("jwtPayload") as any;
-  const domain = decodeURIComponent(c.req.param("domain"));
-  const project = getProjectByDomain(domain);
+  const wallet = getWalletFromRequest(c);
+  if (!wallet) {
+    return c.json({ error: "Connect your wallet to load projects." }, 400);
+  }
 
-  if (!project || project.userId !== user.sub) {
+  const domain = decodeURIComponent(c.req.param("domain"));
+  const project = await getProjectByDomain(domain, wallet);
+
+  if (!project) {
     return c.json({ domain, count: 0, latest: null, history: [] });
   }
 
-  const deployments = listDeploymentsByDomain(domain);
+  const deployments = await listDeploymentsByDomain(domain, wallet);
   const latest = deployments[0] ?? null;
 
   return c.json({
@@ -126,22 +146,26 @@ sitesRouter.get("/:domain", authMiddleware, async (c) => {
           url: deploymentProxyUrl(c, domain),
         }
       : null,
-    history: deployments.map((d) => ({
-      cid: d.cid,
-      deployer: d.deployer,
-      env: d.env,
-      meta: d.meta,
-      timestamp: d.timestamp,
+    history: deployments.map((deployment) => ({
+      cid: deployment.cid,
+      deployer: deployment.deployer,
+      env: deployment.env,
+      meta: deployment.meta,
+      timestamp: deployment.timestamp,
       url: deploymentProxyUrl(c, domain),
     })),
   });
 });
 
-// DELETE /api/sites/:domain - delete project/deployments from JSON and unpin from Pinata
+// DELETE /api/sites/:domain - delete project/deployments and unpin from Pinata
 sitesRouter.delete("/:domain", authMiddleware, async (c) => {
-  const user = c.get("jwtPayload") as any;
+  const wallet = getWalletFromRequest(c);
+  if (!wallet) {
+    return c.json({ error: "Connect your wallet to manage projects." }, 400);
+  }
+
   const domain = decodeURIComponent(c.req.param("domain"));
-  const removed = removeProjectByDomainForUser(domain, user.sub);
+  const removed = await removeProjectByDomainForUser(domain, wallet);
 
   if (!removed) {
     return c.json({ error: "Project not found" }, 404);
@@ -155,7 +179,9 @@ sitesRouter.delete("/:domain", authMiddleware, async (c) => {
     } else {
       try {
         const unpinned = await pinata.unpin(removed.cids);
-        const failed = unpinned.filter((item) => item.status !== "success").map((item) => item.hash);
+        const failed = unpinned
+          .filter((item) => item.status !== "success")
+          .map((item) => item.hash);
         unpinErrors.push(...failed);
       } catch {
         unpinErrors.push(...removed.cids);
@@ -174,23 +200,28 @@ sitesRouter.delete("/:domain", authMiddleware, async (c) => {
 
 // GET /api/sites/:domain/ipns - IPNS-like metadata
 sitesRouter.get("/:domain/ipns", authMiddleware, async (c) => {
-  const user = c.get("jwtPayload") as any;
-  const domain = decodeURIComponent(c.req.param("domain"));
-  const project = getProjectByDomain(domain);
-  const latest = getLatestDeployment(domain);
+  const wallet = getWalletFromRequest(c);
+  if (!wallet) {
+    return c.json({ error: "Connect your wallet to load project metadata." }, 400);
+  }
 
-  if (!project || project.userId !== user.sub || !latest) {
+  const domain = decodeURIComponent(c.req.param("domain"));
+  const project = await getProjectByDomain(domain, wallet);
+  const latest = await getLatestDeployment(domain, wallet);
+
+  if (!project || !latest) {
     return c.json({ error: "No deployments found for this domain" }, 404);
   }
 
   const siteUrl = deploymentProxyUrl(c, domain);
   const gatewayUrl = pinataGatewayUrl(latest.cid);
+  const deployments = await listDeploymentsByDomain(domain, wallet);
 
   return c.json({
     domain,
     ipnsKey: `k51-${project.id.slice(0, 20)}`,
     latestCid: latest.cid,
-    latestSeq: listDeploymentsByDomain(domain).length,
+    latestSeq: deployments.length,
     registeredAt: project.createdAt,
     updatedAt: latest.timestamp,
     active: true,
@@ -206,3 +237,4 @@ export function deployStatusHandler(c: any) {
     max: getMaxConcurrent(),
   });
 }
+

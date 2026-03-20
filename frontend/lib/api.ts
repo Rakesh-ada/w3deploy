@@ -2,6 +2,90 @@ const API_BASE: string =
   process.env.NEXT_PUBLIC_API_URL ?? "https://api.d3ploy.xyz";
 const AUTH_BASE: string =
   process.env.NEXT_PUBLIC_AUTH_API_URL ?? API_BASE;
+const WALLET_STORAGE_KEY = "d3ploy_wallet_address";
+
+declare global {
+  interface Window {
+    ethereum?: {
+      request?: (args: { method: string }) => Promise<unknown>;
+    };
+  }
+}
+
+const ALGORAND_ADDRESS_REGEX = /^[A-Z2-7]{58}$/;
+const EVM_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
+
+function normalizeWalletAddress(address: string): string {
+  const raw = address.trim();
+  if (isLikelyAlgorandAddress(raw)) {
+    return raw.toUpperCase();
+  }
+  if (isLikelyEvmAddress(raw)) {
+    return raw.toLowerCase();
+  }
+  return raw;
+}
+
+export function isLikelyAlgorandAddress(address: string): boolean {
+  return ALGORAND_ADDRESS_REGEX.test(address.trim().toUpperCase());
+}
+
+export function isLikelyEvmAddress(address: string): boolean {
+  return EVM_ADDRESS_REGEX.test(address.trim());
+}
+
+export function getWalletAddress(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = localStorage.getItem(WALLET_STORAGE_KEY);
+  if (!raw) return null;
+
+  const normalized = normalizeWalletAddress(raw);
+  if (!isLikelyAlgorandAddress(normalized) && !isLikelyEvmAddress(normalized)) {
+    localStorage.removeItem(WALLET_STORAGE_KEY);
+    return null;
+  }
+
+  return normalized;
+}
+
+export function saveWalletAddress(address: string): string {
+  const normalized = normalizeWalletAddress(address);
+  if (!isLikelyAlgorandAddress(normalized) && !isLikelyEvmAddress(normalized)) {
+    throw new Error("Invalid wallet address.");
+  }
+
+  localStorage.setItem(WALLET_STORAGE_KEY, normalized);
+  return normalized;
+}
+
+export function clearWalletAddress() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(WALLET_STORAGE_KEY);
+}
+
+export async function connectWallet(): Promise<string> {
+  if (typeof window === "undefined") {
+    throw new Error("Wallet connection is only available in the browser.");
+  }
+
+  const provider = window.ethereum;
+  if (provider?.request) {
+    const accounts = (await provider.request({ method: "eth_requestAccounts" })) as
+      | string[]
+      | undefined;
+    const account = accounts?.[0];
+    if (!account) {
+      throw new Error("No wallet account was returned by your wallet provider.");
+    }
+    return saveWalletAddress(String(account));
+  }
+
+  throw new Error("No compatible wallet provider found.");
+}
+
+export async function disconnectWallet() {
+  clearWalletAddress();
+}
 
 // Token helpers
 export function getToken(): string | null {
@@ -55,11 +139,13 @@ async function apiFetchFrom<T = unknown>(
   opts: RequestInit = {}
 ): Promise<T> {
   const token = getToken();
+  const walletAddress = getWalletAddress();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(opts.headers as Record<string, string>),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
+  if (walletAddress) headers["X-Wallet-Address"] = walletAddress;
 
   const res = await fetch(`${baseUrl}${path}`, { ...opts, headers });
   if (!res.ok) {
@@ -200,6 +286,7 @@ export function deployStream(
   onError: (message: string) => void
 ): () => void {
   const token = getToken();
+  const walletAddress = getWalletAddress();
   const controller = new AbortController();
 
   (async () => {
@@ -215,6 +302,7 @@ export function deployStream(
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(walletAddress ? { "X-Wallet-Address": walletAddress } : {}),
         },
         body: JSON.stringify({
           repoUrl: data.repoUrl,

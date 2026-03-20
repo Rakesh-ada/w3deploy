@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, Geist_Mono, Bitcount_Prop_Double_Ink } from "next/font/google";
 import "./globals.css";
+import WalletProvider from "@/components/wallet-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -43,7 +44,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${plusJakarta.variable} ${geistMono.variable} ${bitcountPropDoubleInk.variable} antialiased bg-tg-black text-white font-sans`}
       >
-        {children}
+        <WalletProvider>{children}</WalletProvider>
       </body>
     </html>
   );

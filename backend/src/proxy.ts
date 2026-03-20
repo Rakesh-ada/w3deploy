@@ -72,7 +72,7 @@ type DeploymentTarget =
   | { cid: string; status: 200 }
   | { error: string; status: 404 };
 
-function resolveDeploymentTarget(rawIdentifier: string): DeploymentTarget {
+async function resolveDeploymentTarget(rawIdentifier: string): Promise<DeploymentTarget> {
   const identifier = normalizeIdentifier(rawIdentifier);
   if (!identifier) {
     return { error: "Missing deployment identifier", status: 404 };
@@ -83,13 +83,13 @@ function resolveDeploymentTarget(rawIdentifier: string): DeploymentTarget {
     return { cid: identifier, status: 200 };
   }
 
-  const latest = getLatestDeployment(identifier);
+  const latest = await getLatestDeployment(identifier);
   if (latest) {
     return { cid: latest.cid, status: 200 };
   }
 
   // If project exists but has no deployments yet, return 404 immediately.
-  const project = getProjectByDomain(identifier);
+  const project = await getProjectByDomain(identifier);
   if (project) {
     return { error: `No deployment found yet for project "${identifier}"`, status: 404 };
   }
@@ -113,7 +113,7 @@ export async function serveDeploymentByIdentifier(
   rawIdentifier: string,
   rawSubpath: string
 ): Promise<Response> {
-  const target = resolveDeploymentTarget(rawIdentifier);
+  const target = await resolveDeploymentTarget(rawIdentifier);
   if ("error" in target) {
     return c.text(target.error, target.status);
   }
