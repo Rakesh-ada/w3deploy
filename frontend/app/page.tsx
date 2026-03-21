@@ -196,17 +196,10 @@ function AnimatedGroup({ children, className, variants, preset }: AnimatedGroupP
 // Logo Component
 const Logo = ({ className }: { className?: string }) => {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-5 w-auto">
-        <path d="M3 0H5V18H3V0ZM13 0H15V18H13V0ZM18 3V5H0V3H18ZM0 15V13H18V15H0Z" fill="url(#logo-gradient)" />
-        <defs>
-          <linearGradient id="logo-gradient" x1="10" y1="0" x2="10" y2="20" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#9B99FE" />
-            <stop offset="1" stopColor="#2BC8B7" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <span className="font-semibold text-xl text-foreground tracking-tight">w3deploy</span>
+    <div className={cn("flex items-center space-x-2", className)}>
+      <span style={{ fontFamily: 'var(--font-bitcount)' }} className="text-4xl tracking-tight text-white">
+        W3DEPLOY
+      </span>
     </div>
   );
 };
@@ -744,7 +737,7 @@ export function ModernDarkHeroSection() {
         </div>
 
         {/* How It Works Section */}
-        <section className="bg-black py-24 md:py-32">
+        <section className="bg-[#0A0A0A] py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-6">
             {/* Header */}
             <div className="mb-16 space-y-6 flex flex-col items-center text-center max-w-4xl mx-auto">
