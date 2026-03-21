@@ -113,7 +113,7 @@ export default function Navbar() {
       {/* Logo */}
       <Link href="/" className="flex items-center space-x-2">
         <span style={{ fontFamily: 'var(--font-bitcount)' }} className="text-4xl tracking-tight text-white">
-          W3DEPLOY
+          AlgoFlow
         </span>
       </Link>
 

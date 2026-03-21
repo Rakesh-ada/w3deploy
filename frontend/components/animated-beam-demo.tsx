@@ -57,7 +57,7 @@ export function AnimatedBeamDemo() {
             <Circle ref={div4Ref} className="w-auto h-auto rounded-xl bg-zinc-950 border border-purple-500/50 flex flex-col justify-center items-center px-6 py-4">
               <Link href="/" className="flex items-center space-x-2">
                 <span style={{ fontFamily: 'var(--font-bitcount)' }} className="text-4xl tracking-tight text-white">
-                  W3DEPLOY
+                  AlgoFlow
                 </span>
               </Link>
             </Circle>

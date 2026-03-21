@@ -82,7 +82,7 @@ export default function Home() {
                         <div>
                             <h3 className="font-display text-xl font-bold mb-2">Native MCP Server</h3>
                             <p className="text-tg-muted text-sm leading-relaxed">
-                                Connect your IDE to W3DEPLOY via MCP. Let your local AI assistants instantly spin up previews and push to production.
+                                Connect your IDE to AlgoFlow via MCP. Let your local AI assistants instantly spin up previews and push to production.
                             </p>
                         </div>
                     </div>
@@ -110,12 +110,12 @@ export default function Home() {
                                 {
                                     step: "01",
                                     title: "Connect your repo",
-                                    desc: "Authenticate with GitHub and link your repository. W3DEPLOY registers a webhook to listen for new pushes.",
+                                    desc: "Authenticate with GitHub and link your repository. AlgoFlow registers a webhook to listen for new pushes.",
                                 },
                                 {
                                     step: "02",
                                     title: "Push to deploy",
-                                    desc: "On every push to your configured branch, W3DEPLOY builds your project and pins the output to IPFS automatically.",
+                                    desc: "On every push to your configured branch, AlgoFlow builds your project and pins the output to IPFS automatically.",
                                 },
                                 {
                                     step: "03",
@@ -158,7 +158,7 @@ export default function Home() {
                 {/* Footer */}
                 <footer className="mt-20 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-tg-muted text-xs font-medium">
                     <div className="flex items-center space-x-4 mb-4 md:mb-0">
-                        <span>© 2024 W3DEPLOY FOUNDATION</span>
+                        <span>© 2024 AlgoFlow FOUNDATION</span>
                         <span className="w-1 h-1 bg-white/20 rounded-full" />
                         <span className="hover:text-white cursor-pointer transition-colors">TERMS OF SERVICE</span>
                     </div>

@@ -198,7 +198,7 @@ const Logo = ({ className }: { className?: string }) => {
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <span style={{ fontFamily: 'var(--font-bitcount)' }} className="text-4xl tracking-tight text-white">
-        W3DEPLOY
+        AlgoFlow
       </span>
     </div>
   );
@@ -404,7 +404,7 @@ export function ModernDarkHeroSection() {
                     Deploy Web2 Apps to Web3 — Instantly
                   </h1>
                   <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-muted-foreground">
-                    W3Deploy uses AI to convert, optimize, and deploy your apps to IPFS with verifiable on-chain ownership.
+                    AlgoFlow uses AI to convert, optimize, and deploy your apps to IPFS with verifiable on-chain ownership.
                   </p>
                 </AnimatedGroup>
 
@@ -709,7 +709,7 @@ export function ModernDarkHeroSection() {
                     className="bg-green-800 dark:bg-green-900/50 rounded-2xl shadow-xl p-8 space-y-6 border border-green-600/50"
                   >
                     <h3 className="text-green-100 font-bold text-sm uppercase tracking-wider">
-                      W3Deploy
+                      AlgoFlow
                     </h3>
                     <div className="space-y-4">
                       <div className="flex items-start gap-3">
@@ -754,141 +754,155 @@ export function ModernDarkHeroSection() {
 
             {/* Feature Cards Bento Grid */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-24">
-                {/* Hero Card */}
-                <motion.section 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    viewport={{ once: true }}
-                    className="md:col-span-8 rounded-[2rem] bg-[#B2A7FF] p-8 md:p-12 flex flex-col justify-between min-h-[400px] text-black transition-transform duration-200 hover:-translate-y-0.5"
-                >
-                    <div>
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter">
-                            Censorship-Resistant<br />Hosting
-                        </h1>
-                        <p className="mt-4 text-base font-medium opacity-80 max-w-sm leading-relaxed">
-                            Deploy decentralized applications directly to IPFS
-                            with millisecond latency. No servers. No censorship.
-                            Unstoppable.
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-4 mt-12">
-                        <a href="/login">
-                            <button className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm tracking-wide flex items-center space-x-2 hover:opacity-90 transition-all">
-                                <span>GET STARTED</span>
-                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                </svg>
-                            </button>
-                        </a>
-                        <a href="/dashboard">
-                            <button className="border border-black/20 text-black px-8 py-4 rounded-full font-bold text-sm tracking-wide hover:bg-black/5 transition-all">
-                                DASHBOARD
-                            </button>
-                        </a>
-                    </div>
-                </motion.section>
+              {/* Hero Card */}
+              <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                viewport={{ once: true }}
+                className="md:col-span-8 rounded-[2rem] bg-[#B2A7FF] p-8 md:p-12 flex flex-col justify-between min-h-[400px] text-black transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                <div>
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter">
+                    Censorship-Resistant<br />Hosting
+                  </h1>
+                  <p className="mt-4 text-base font-medium opacity-80 max-w-sm leading-relaxed">
+                    Deploy decentralized applications directly to IPFS
+                    with millisecond latency. No servers. No censorship.
+                    Unstoppable.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 mt-12">
+                  <a href="/login">
+                    <button className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm tracking-wide flex items-center space-x-2 hover:opacity-90 transition-all">
+                      <span>GET STARTED</span>
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </button>
+                  </a>
+                  <a href="/dashboard">
+                    <button className="border border-black/20 text-black px-8 py-4 rounded-full font-bold text-sm tracking-wide hover:bg-black/5 transition-all">
+                      DASHBOARD
+                    </button>
+                  </a>
+                </div>
+              </motion.section>
 
-                {/* Feature Card – IPFS */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    viewport={{ once: true }}
-                    className="md:col-span-4 rounded-[2rem] bg-[#1C1C1C] p-8 border border-white/5 flex flex-col justify-between min-h-[400px] transition-transform duration-200 hover:-translate-y-0.5 text-white"
-                >
-                    <div className="w-32 h-32 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 mx-auto md:mx-0">
-                        <svg className="w-20 h-20 text-[#B2A7FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 className="text-2xl font-bold mb-2 text-white">IPFS Hosting</h3>
-                        <p className="text-zinc-400 text-sm leading-relaxed">
-                            Every deployment is content-addressed and pinned to IPFS. Your
-                            site lives forever — no single point of failure.
-                        </p>
-                    </div>
-                </motion.div>
+              {/* Feature Card – IPFS */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                viewport={{ once: true }}
+                className="md:col-span-4 rounded-[2rem] bg-[#1C1C1C] p-8 border border-white/5 flex flex-col justify-between min-h-[400px] transition-transform duration-200 hover:-translate-y-0.5 text-white"
+              >
+                <div className="w-32 h-32 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 mx-auto md:mx-0">
+                  <svg className="w-20 h-20 text-[#B2A7FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-2 text-white">IPFS Hosting</h3>
+                  <p className="text-zinc-400 text-sm leading-relaxed">
+                    Every deployment is content-addressed and pinned to IPFS. Your
+                    site lives forever — no single point of failure.
+                  </p>
+                </div>
+              </motion.div>
 
-                {/* Feature Card – GitHub CI/CD */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    viewport={{ once: true }}
-                    className="md:col-span-4 rounded-[2rem] bg-[#DEFA6F] p-8 flex flex-col justify-between min-h-[280px] text-black transition-transform duration-200 hover:-translate-y-0.5"
-                >
-                    <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-6">
-                        <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold mb-2">GitHub CI/CD</h3>
-                        <p className="text-black/70 text-sm leading-relaxed">
-                            Connect your repo and every push to <span className="font-mono font-bold">main</span> auto-deploys
-                            to IPFS. Zero config continuous delivery.
-                        </p>
-                    </div>
-                </motion.div>
+              {/* Feature Card – GitHub CI/CD */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="md:col-span-4 rounded-[2rem] bg-[#DEFA6F] p-8 flex flex-col justify-between min-h-[280px] text-black transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-6">
+                  <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">GitHub CI/CD</h3>
+                  <p className="text-black/70 text-sm leading-relaxed">
+                    Connect your repo and every push to <span className="font-mono font-bold">main</span> auto-deploys
+                    to IPFS. Zero config continuous delivery.
+                  </p>
+                </div>
+              </motion.div>
 
-                {/* Feature Card – Native MCP */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    viewport={{ once: true }}
-                    className="md:col-span-4 rounded-[2rem] bg-[#1C1C1C] p-8 border border-white/5 flex flex-col justify-between min-h-[280px] transition-transform duration-200 hover:-translate-y-0.5 text-white"
-                >
-                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold mb-2">Native MCP Server</h3>
-                        <p className="text-zinc-400 text-sm leading-relaxed">
-                            Connect your IDE to W3DEPLOY via MCP. Let your local AI assistants instantly spin up previews and push to production.
-                        </p>
-                    </div>
-                </motion.div>
+              {/* Feature Card – Native MCP */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="md:col-span-4 rounded-[2rem] bg-[#1C1C1C] p-8 border border-white/5 flex flex-col justify-between min-h-[280px] transition-transform duration-200 hover:-translate-y-0.5 text-white"
+              >
+                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Native MCP Server</h3>
+                  <p className="text-zinc-400 text-sm leading-relaxed">
+                    Connect your IDE to AlgoFlow via MCP. Let your local AI assistants instantly spin up previews and push to production.
+                  </p>
+                </div>
+              </motion.div>
 
-                {/* Feature Card – Deployment History */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                    viewport={{ once: true }}
-                    className="md:col-span-4 rounded-[2rem] bg-[#B2A7FF] p-8 flex flex-col justify-between min-h-[280px] text-black transition-transform duration-200 hover:-translate-y-0.5"
-                >
-                    <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-6">
-                        <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold mb-2">Deployment History</h3>
-                        <p className="text-black/70 text-sm leading-relaxed">
-                            Track every release with timestamps, commit hashes, and immutable CIDs so you can audit rollouts instantly.
-                        </p>
-                    </div>
-                </motion.div>
+              {/* Feature Card – Deployment History */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                viewport={{ once: true }}
+                className="md:col-span-4 rounded-[2rem] bg-[#B2A7FF] p-8 flex flex-col justify-between min-h-[280px] text-black transition-transform duration-200 hover:-translate-y-0.5"
+              >
+                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-6">
+                  <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Deployment History</h3>
+                  <p className="text-black/70 text-sm leading-relaxed">
+                    Track every release with timestamps, commit hashes, and immutable CIDs so you can audit rollouts instantly.
+                  </p>
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>
 
         {/* How It Works Process Section */}
-        <section className="bg-black py-24 md:py-32">
+        <section className="py-24 md:py-32" style={{ backgroundColor: '#0A0A0A' }}>
           <div className="mx-auto max-w-7xl px-6">
             {/* Section Header */}
-            <div className="mb-16 text-center">
-              <p className="text-sm text-zinc-400 uppercase tracking-wider mb-4">
-                How It Works
-              </p>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white max-w-4xl mx-auto">
-                Simple steps to deploy unstoppable sites
+            <div className="mb-16 flex flex-col items-center text-center space-y-4">
+              {/* Tag */}
+              <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9" />
+                </svg>
+                <span className="text-sm font-semibold text-purple-400 uppercase tracking-wider">Deployment Flow</span>
+              </div>
+
+              {/* Heading */}
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white whitespace-nowrap">
+                Deploy unstoppable{" "}
+                <span className="bg-gradient-to-r from-indigo-500 to-teal-400 bg-clip-text text-transparent">
+                  sites in minutes
+                </span>
               </h2>
+
+              {/* Subheading */}
+              <p className="text-lg text-zinc-400 max-w-2xl text-balance">
+                From build to global access — AlgoFlow handles packaging, pinning, domain linking, and updates across decentralized infrastructure.
+              </p>
             </div>
 
             {/* Steps Grid */}
@@ -1197,8 +1211,33 @@ export function ModernDarkHeroSection() {
         </section>
 
         {/* Pricing Section */}
-        <section className="bg-black py-24 md:py-32">
+        <section className="py-24 md:py-32" style={{ backgroundColor: '#0A0A0A' }}>
           <div className="mx-auto max-w-7xl px-6">
+            {/* Section Header */}
+            <div className="mb-16 flex flex-col items-center text-center space-y-4">
+              {/* Tag */}
+              <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.42 0l8.58-8.58a1 1 0 0 0 0-1.42L12 2Z" />
+                  <circle cx="7" cy="7" r="1" fill="currentColor" />
+                </svg>
+                <span className="text-sm font-semibold text-purple-400 uppercase tracking-wider">Pricing Plans</span>
+              </div>
+
+              {/* Heading */}
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white whitespace-nowrap">
+                Simple &amp;{" "}
+                <span className="bg-gradient-to-r from-indigo-500 to-teal-400 bg-clip-text text-transparent">
+                  Transparent Plans
+                </span>
+              </h2>
+
+              {/* Subheading */}
+              <p className="text-lg text-zinc-400 max-w-2xl text-balance">
+                Pay only for what you deploy — decentralized hosting, ENS integration, and seamless updates included.
+              </p>
+            </div>
+
             {/* Pricing Cards Grid */}
             <div className="grid md:grid-cols-3 gap-6">
               {/* Starter Plan */}
@@ -1207,7 +1246,7 @@ export function ModernDarkHeroSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.1 }}
                 viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
+                className="bg-zinc-900/50 border-2 border-zinc-800 rounded-3xl p-8 space-y-6 transition-all duration-300 hover:border-dashed hover:border-purple-500"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
@@ -1272,7 +1311,7 @@ export function ModernDarkHeroSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-b from-purple-900/50 to-purple-950/30 border border-purple-700/50 rounded-3xl p-8 space-y-6 relative"
+                className="bg-gradient-to-b from-purple-900/50 to-purple-950/30 border-2 border-purple-700/50 rounded-3xl p-8 space-y-6 relative transition-all duration-300 hover:border-purple-500"
               >
                 <div className="absolute top-4 right-4">
                   <span className="bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">Popular</span>
@@ -1339,7 +1378,7 @@ export function ModernDarkHeroSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
                 viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
+                className="bg-zinc-900/50 border-2 border-zinc-800 rounded-3xl p-8 space-y-6 transition-all duration-300 hover:border-dashed hover:border-purple-500"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-yellow-600 flex items-center justify-center">
@@ -1418,7 +1457,7 @@ export function ModernDarkHeroSection() {
                   Key Integrations
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  These protocols and services power W3Deploy, creating a fully decentralized deployment stack.
+                  These protocols and services power AlgoFlow, creating a fully decentralized deployment stack.
                 </p>
               </div>
 
@@ -1543,7 +1582,7 @@ export function ModernDarkHeroSection() {
         </section>
 
         {/* Glossy Purple CTA Section */}
-        <section className="bg-black py-24 md:py-32">
+        <section className="py-24 md:py-32" style={{ backgroundColor: '#0A0A0A' }}>
           <div className="mx-auto max-w-7xl px-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1561,7 +1600,7 @@ export function ModernDarkHeroSection() {
 
               <div className="relative z-10 space-y-6">
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-                  Let See W3Deploy in Action
+                  Let See AlgoFlow in Action
                 </h2>
                 <p className="text-xl text-purple-100 max-w-2xl mx-auto">
                   Book a Call Today and Start Automating
@@ -1588,7 +1627,7 @@ export function ModernDarkHeroSection() {
               <div className="space-y-4">
                 <Logo className="h-6 w-auto" />
                 <p className="text-zinc-400 text-sm leading-relaxed">
-                  W3Deploy — Automate Smarter, Optimize Faster, and Grow Stronger.
+                  AlgoFlow — Automate Smarter, Optimize Faster, and Grow Stronger.
                 </p>
                 <div className="space-y-2">
                   <p className="text-sm text-zinc-300 font-semibold">Join our newsletter</p>
@@ -1643,7 +1682,7 @@ export function ModernDarkHeroSection() {
             {/* Bottom Bar */}
             <div className="border-t border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-zinc-500 text-sm">
-                © 2024 W3Deploy. All rights reserved.
+                © 2024 AlgoFlow. All rights reserved.
               </p>
               <div className="flex gap-6">
                 <a href="#" className="text-zinc-500 hover:text-white text-sm transition-colors">Privacy Policy</a>
