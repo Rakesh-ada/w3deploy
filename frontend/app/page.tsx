@@ -482,340 +482,404 @@ export function ModernDarkHeroSection() {
           <section className="sticky top-0 h-[100dvh] w-full flex flex-col justify-center bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 z-10 overflow-hidden transform-gpu">
             <div className="mx-auto max-w-7xl px-6 w-full">
               <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              {/* Left Content */}
-              <div className="space-y-6">
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-                  Farewell to downtime.
-                </h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Your site lives on IPFS — content-addressed, unstoppable, and pinned with provider failover for reliability. No single entity can take it down.
-                </p>
-              </div>
-
-              {/* Right Terminal */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                <div className="bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-800">
-                  {/* Terminal Header */}
-                  <div className="bg-zinc-800/50 px-4 py-3 flex items-center gap-2 border-b border-zinc-700/50">
-                    <div className="flex gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    </div>
-                  </div>
-
-                  {/* Terminal Content */}
-                  <div className="p-6 font-mono text-sm space-y-2">
-                    <div className="text-zinc-500">
-                      # GitHub Actions · deploy.yml · push to main
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-yellow-400">▶</span>
-                      <span className="text-zinc-200">Run deploy job</span>
-                    </div>
-                    <div className="pl-4 space-y-1.5">
-                      <div className="flex items-start gap-2">
-                        <span className="text-green-400"></span>
-                        <span className="text-zinc-400">
-                          Building... <span className="text-green-400">dist/</span> (2.3MB, 847 files)
-                        </span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <span className="text-green-400"></span>
-                        <span className="text-zinc-400">
-                          Uploading to Pinata (v3)... <span className="text-green-400">bafybeig3...</span>
-                        </span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <span className="text-green-400"></span>
-                        <span className="text-zinc-400">
-                          Fallback check (Pinata v2 / Lighthouse)... <span className="text-green-400">ready if needed</span>
-                        </span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <span className="text-green-400"></span>
-                        <span className="text-zinc-400">
-                          Updating ENS/IPNS... <span className="text-green-400">auto subdomain or custom ENS flow</span>
-                        </span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <span className="text-green-400"></span>
-                        <span className="text-zinc-400">
-                          Writing log... <span className="text-green-400">latest-deploy.json</span>
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-3">
-                        <span className="text-pink-400"></span>
-                        <span className="text-zinc-300">
-                          Live at <a href="https://myapp.eth.limo" className="text-cyan-400 hover:underline">https://myapp.eth.limo</a>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                {/* Left Content */}
+                <div className="space-y-6">
+                  <h2 className="text-4xl md:text-5xl font-bold text-foreground">
+                    Farewell to downtime.
+                  </h2>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    Your site lives on IPFS — content-addressed, unstoppable, and pinned with provider failover for reliability. No single entity can take it down.
+                  </p>
                 </div>
-              </motion.div>
+
+                {/* Right Terminal */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="relative"
+                >
+                  <div className="bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-800">
+                    {/* Terminal Header */}
+                    <div className="bg-zinc-800/50 px-4 py-3 flex items-center gap-2 border-b border-zinc-700/50">
+                      <div className="flex gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      </div>
+                    </div>
+
+                    {/* Terminal Content */}
+                    <div className="p-6 font-mono text-sm space-y-2">
+                      <div className="text-zinc-500">
+                        # GitHub Actions · deploy.yml · push to main
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-400">▶</span>
+                        <span className="text-zinc-200">Run deploy job</span>
+                      </div>
+                      <div className="pl-4 space-y-1.5">
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400"></span>
+                          <span className="text-zinc-400">
+                            Building... <span className="text-green-400">dist/</span> (2.3MB, 847 files)
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400"></span>
+                          <span className="text-zinc-400">
+                            Uploading to Pinata (v3)... <span className="text-green-400">bafybeig3...</span>
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400"></span>
+                          <span className="text-zinc-400">
+                            Fallback check (Pinata v2 / Lighthouse)... <span className="text-green-400">ready if needed</span>
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400"></span>
+                          <span className="text-zinc-400">
+                            Updating ENS/IPNS... <span className="text-green-400">auto subdomain or custom ENS flow</span>
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-green-400"></span>
+                          <span className="text-zinc-400">
+                            Writing log... <span className="text-green-400">latest-deploy.json</span>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-3">
+                          <span className="text-pink-400"></span>
+                          <span className="text-zinc-300">
+                            Live at <a href="https://myapp.eth.limo" className="text-cyan-400 hover:underline">https://myapp.eth.limo</a>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
           {/* Config On-Chain Section */}
           <section className="sticky top-0 h-[100dvh] w-full flex flex-col justify-center bg-gradient-to-b from-pink-100 to-pink-50 dark:from-pink-950 dark:to-pink-900 z-20 overflow-hidden border-t-2 border-white/5 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] transform-gpu">
             <div className="mx-auto max-w-7xl px-6 w-full">
               <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              {/* Left Content */}
-              <div className="space-y-6">
-                <div className="flex gap-2 mb-6">
-                  <div className="w-4 h-4 rounded bg-purple-900"></div>
-                  <div className="w-4 h-4 rounded bg-purple-400/40"></div>
-                  <div className="w-4 h-4 rounded bg-purple-400/40"></div>
+                {/* Left Content */}
+                <div className="space-y-6">
+                  <div className="flex gap-2 mb-6">
+                    <div className="w-4 h-4 rounded bg-purple-900"></div>
+                    <div className="w-4 h-4 rounded bg-purple-400/40"></div>
+                    <div className="w-4 h-4 rounded bg-purple-400/40"></div>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-bold text-foreground">
+                    Config lives on-chain.
+                  </h2>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    Use auto subdomains under pushx.eth, or bring your own ENS with one-time ENS → IPNS setup and automatic IPNS → IPFS updates on every deploy.
+                  </p>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-                  Config lives on-chain.
-                </h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Use auto subdomains under pushx.eth, or bring your own ENS with one-time ENS → IPNS setup and automatic IPNS → IPFS updates on every deploy.
-                </p>
-              </div>
 
-              {/* Right ENS Config Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
-                <div className="bg-gradient-to-br from-pink-50 via-white to-pink-50/30 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-pink-200/50 dark:border-zinc-700">
-                  {/* Dotted Background Pattern */}
-                  <div className="absolute inset-0 opacity-20" style={{
-                    backgroundImage: 'radial-gradient(circle, #ec4899 1px, transparent 1px)',
-                    backgroundSize: '20px 20px'
-                  }}></div>
+                {/* Right ENS Config Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="relative"
+                >
+                  <div className="bg-gradient-to-br from-pink-50 via-white to-pink-50/30 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-pink-200/50 dark:border-zinc-700">
+                    {/* Dotted Background Pattern */}
+                    <div className="absolute inset-0 opacity-20" style={{
+                      backgroundImage: 'radial-gradient(circle, #ec4899 1px, transparent 1px)',
+                      backgroundSize: '20px 20px'
+                    }}></div>
 
-                  {/* Card Content */}
-                  <div className="relative p-8 space-y-6">
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-mono font-bold text-foreground">myapp.eth</h3>
-                      <p className="text-sm text-muted-foreground">— ENS Text Records</p>
-                    </div>
+                    {/* Card Content */}
+                    <div className="relative p-8 space-y-6">
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-mono font-bold text-foreground">myapp.eth</h3>
+                        <p className="text-sm text-muted-foreground">— ENS Text Records</p>
+                      </div>
 
-                    <div className="space-y-4 font-mono text-sm">
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">deploy.cid</span>
-                        <span className="text-teal-500 dark:text-teal-400 font-semibold">bafybeig3...</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">ens.mode</span>
-                        <span className="text-pink-600 dark:text-pink-400 font-semibold">auto | custom</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">ens.contenthash</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold">ipfs://... or ipns://...</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">deploy.env</span>
-                        <span className="text-blue-600 dark:text-blue-400 font-semibold">production</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">deploy.framework</span>
-                        <span className="text-purple-600 dark:text-purple-400 font-semibold">next</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">access.policy</span>
-                        <span className="text-orange-600 dark:text-orange-400 font-semibold">token-gated</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">gov.multisig</span>
-                        <span className="text-red-600 dark:text-red-400 font-semibold">0xSAFE...</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-muted-foreground">fee.recipient</span>
-                        <span className="text-gray-700 dark:text-gray-300 font-semibold">0xABCD...</span>
+                      <div className="space-y-4 font-mono text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">deploy.cid</span>
+                          <span className="text-teal-500 dark:text-teal-400 font-semibold">bafybeig3...</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">ens.mode</span>
+                          <span className="text-pink-600 dark:text-pink-400 font-semibold">auto | custom</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">ens.contenthash</span>
+                          <span className="text-blue-600 dark:text-blue-400 font-semibold">ipfs://... or ipns://...</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">deploy.env</span>
+                          <span className="text-blue-600 dark:text-blue-400 font-semibold">production</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">deploy.framework</span>
+                          <span className="text-purple-600 dark:text-purple-400 font-semibold">next</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">access.policy</span>
+                          <span className="text-orange-600 dark:text-orange-400 font-semibold">token-gated</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">gov.multisig</span>
+                          <span className="text-red-600 dark:text-red-400 font-semibold">0xSAFE...</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">fee.recipient</span>
+                          <span className="text-gray-700 dark:text-gray-300 font-semibold">0xABCD...</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
           {/* True Ownership Section */}
           <section className="sticky top-0 h-[100dvh] w-full flex flex-col justify-center bg-gradient-to-b from-green-100 to-green-50 dark:from-green-950 dark:to-green-900 z-30 overflow-hidden border-t-2 border-white/5 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] transform-gpu">
             <div className="mx-auto max-w-7xl px-6 w-full">
-            {/* Header */}
-            <div className="mb-16 space-y-6">
-              <div className="flex gap-2 mb-6">
-                <div className="w-4 h-4 rounded bg-green-800"></div>
-                <div className="w-4 h-4 rounded bg-green-400/40"></div>
-                <div className="w-4 h-4 rounded bg-green-400/40"></div>
+              {/* Header */}
+              <div className="mb-16 space-y-6">
+                <div className="flex gap-2 mb-6">
+                  <div className="w-4 h-4 rounded bg-green-800"></div>
+                  <div className="w-4 h-4 rounded bg-green-400/40"></div>
+                  <div className="w-4 h-4 rounded bg-green-400/40"></div>
+                </div>
+                <div className="grid lg:grid-cols-2 gap-8 items-end">
+                  <h2 className="text-4xl md:text-5xl font-bold text-foreground">
+                    True ownership.
+                  </h2>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    Your ENS domain is 100% yours. No registrar can seize it, no CDN can blacklist you. Your site is uncensored and irrevocable — forever.
+                  </p>
+                </div>
               </div>
-              <div className="grid lg:grid-cols-2 gap-8 items-end">
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-                  True ownership.
-                </h2>
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  Your ENS domain is 100% yours. No registrar can seize it, no CDN can blacklist you. Your site is uncensored and irrevocable — forever.
-                </p>
+
+              {/* Comparison Cards */}
+              <div className="relative">
+                {/* Dotted Background */}
+                <div className="absolute inset-0 opacity-20" style={{
+                  backgroundImage: 'radial-gradient(circle, #10b981 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}></div>
+
+                <div className="relative grid md:grid-cols-2 gap-8">
+                  {/* Web2 Hosting Card */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                    viewport={{ once: true }}
+                    className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 space-y-6 border border-red-200/50 dark:border-zinc-700"
+                  >
+                    <h3 className="text-red-600 dark:text-red-400 font-bold text-sm uppercase tracking-wider">
+                      Web2 Hosting
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-red-500 mt-1"></span>
+                        <p className="text-foreground/80">Domain registrars can seize your .com</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-red-500 mt-1"></span>
+                        <p className="text-foreground/80">CDNs can blacklist your IP address</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-red-500 mt-1"></span>
+                        <p className="text-foreground/80">GitHub can suspend your pipeline</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-red-500 mt-1"></span>
+                        <p className="text-foreground/80">No on-chain audit trail of deploys</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* D3ploy Card */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                    viewport={{ once: true }}
+                    className="bg-green-800 dark:bg-green-900/50 rounded-2xl shadow-xl p-8 space-y-6 border border-green-600/50"
+                  >
+                    <h3 className="text-green-100 font-bold text-sm uppercase tracking-wider">
+                      W3Deploy
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-green-300 mt-1"></span>
+                        <p className="text-green-50">ENS domain — permanently on-chain</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-green-300 mt-1"></span>
+                        <p className="text-green-50">IPFS content is content-addressed forever</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-green-300 mt-1"></span>
+                        <p className="text-green-50">Pinata-first upload with fallback chain</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-green-300 mt-1"></span>
+                        <p className="text-green-50">Immutable deploy registry on-chain</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </div>
-
-            {/* Comparison Cards */}
-            <div className="relative">
-              {/* Dotted Background */}
-              <div className="absolute inset-0 opacity-20" style={{
-                backgroundImage: 'radial-gradient(circle, #10b981 1px, transparent 1px)',
-                backgroundSize: '20px 20px'
-              }}></div>
-
-              <div className="relative grid md:grid-cols-2 gap-8">
-                {/* Web2 Hosting Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-8 space-y-6 border border-red-200/50 dark:border-zinc-700"
-                >
-                  <h3 className="text-red-600 dark:text-red-400 font-bold text-sm uppercase tracking-wider">
-                    Web2 Hosting
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <span className="text-red-500 mt-1"></span>
-                      <p className="text-foreground/80">Domain registrars can seize your .com</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-red-500 mt-1"></span>
-                      <p className="text-foreground/80">CDNs can blacklist your IP address</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-red-500 mt-1"></span>
-                      <p className="text-foreground/80">GitHub can suspend your pipeline</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-red-500 mt-1"></span>
-                      <p className="text-foreground/80">No on-chain audit trail of deploys</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* D3ploy Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="bg-green-800 dark:bg-green-900/50 rounded-2xl shadow-xl p-8 space-y-6 border border-green-600/50"
-                >
-                  <h3 className="text-green-100 font-bold text-sm uppercase tracking-wider">
-                    W3Deploy
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <span className="text-green-300 mt-1"></span>
-                      <p className="text-green-50">ENS domain — permanently on-chain</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-green-300 mt-1"></span>
-                      <p className="text-green-50">IPFS content is content-addressed forever</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-green-300 mt-1"></span>
-                      <p className="text-green-50">Pinata-first upload with fallback chain</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <span className="text-green-300 mt-1"></span>
-                      <p className="text-green-50">Immutable deploy registry on-chain</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
 
         {/* How It Works Section */}
         <section className="bg-black py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-6">
             {/* Header */}
-            <div className="mb-16 space-y-6">
+            <div className="mb-16 space-y-6 flex flex-col items-center text-center max-w-4xl mx-auto">
               <p className="text-sm text-zinc-400 uppercase tracking-wider">
-                How It Works
+                🧱 DEPLOYMENT STACK
               </p>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white max-w-3xl">
-                The stack stays simple even when the infrastructure does not.
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-balance">
+                Simplicity meets power
               </h2>
-              <p className="text-lg text-zinc-400 max-w-2xl">
-                W3Deploy keeps deployment readable: redundant pinning, a censorship-resistant routing layer, and one place to manage updates.
+              <p className="text-lg text-zinc-400 max-w-2xl text-balance">
+                A clean deployment layer powered by redundancy, censorship resistance, and full control — without the complexity.
               </p>
             </div>
 
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Reliability Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">
-                  Reliability
-                </p>
-                <div className="text-6xl md:text-7xl font-bold text-pink-600 dark:text-pink-500">
-                  3
-                </div>
-                <p className="text-xl font-semibold text-white">
-                  pinning providers
-                </p>
-              </motion.div>
+            {/* Feature Cards Bento Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-24">
+                {/* Hero Card */}
+                <motion.section 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    viewport={{ once: true }}
+                    className="md:col-span-8 rounded-[2rem] bg-[#B2A7FF] p-8 md:p-12 flex flex-col justify-between min-h-[400px] text-black transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                    <div>
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tighter">
+                            Censorship-Resistant<br />Hosting
+                        </h1>
+                        <p className="mt-4 text-base font-medium opacity-80 max-w-sm leading-relaxed">
+                            Deploy decentralized applications directly to IPFS
+                            with millisecond latency. No servers. No censorship.
+                            Unstoppable.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-4 mt-12">
+                        <a href="/login">
+                            <button className="bg-black text-white px-8 py-4 rounded-full font-bold text-sm tracking-wide flex items-center space-x-2 hover:opacity-90 transition-all">
+                                <span>GET STARTED</span>
+                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </button>
+                        </a>
+                        <a href="/dashboard">
+                            <button className="border border-black/20 text-black px-8 py-4 rounded-full font-bold text-sm tracking-wide hover:bg-black/5 transition-all">
+                                DASHBOARD
+                            </button>
+                        </a>
+                    </div>
+                </motion.section>
 
-              {/* Availability Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">
-                  Availability
-                </p>
-                <div className="text-6xl md:text-7xl font-bold text-pink-600 dark:text-pink-500">
-                  100%
-                </div>
-                <p className="text-xl font-semibold text-white">
-                  censorship-resistant
-                </p>
-              </motion.div>
+                {/* Feature Card – IPFS */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    viewport={{ once: true }}
+                    className="md:col-span-4 rounded-[2rem] bg-[#1C1C1C] p-8 border border-white/5 flex flex-col justify-between min-h-[400px] transition-transform duration-200 hover:-translate-y-0.5 text-white"
+                >
+                    <div className="w-32 h-32 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 mx-auto md:mx-0">
+                        <svg className="w-20 h-20 text-[#B2A7FF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-bold mb-2 text-white">IPFS Hosting</h3>
+                        <p className="text-zinc-400 text-sm leading-relaxed">
+                            Every deployment is content-addressed and pinned to IPFS. Your
+                            site lives forever — no single point of failure.
+                        </p>
+                    </div>
+                </motion.div>
 
-              {/* Control Card */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <p className="text-xs text-zinc-400 uppercase tracking-wider">
-                  Control
-                </p>
-                <div className="text-6xl md:text-7xl font-bold text-pink-600 dark:text-pink-500">
-                  1
-                </div>
-                <p className="text-xl font-semibold text-white">
-                  dashboard to manage
-                </p>
-              </motion.div>
+                {/* Feature Card – GitHub CI/CD */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    viewport={{ once: true }}
+                    className="md:col-span-4 rounded-[2rem] bg-[#DEFA6F] p-8 flex flex-col justify-between min-h-[280px] text-black transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                    <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-6">
+                        <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold mb-2">GitHub CI/CD</h3>
+                        <p className="text-black/70 text-sm leading-relaxed">
+                            Connect your repo and every push to <span className="font-mono font-bold">main</span> auto-deploys
+                            to IPFS. Zero config continuous delivery.
+                        </p>
+                    </div>
+                </motion.div>
+
+                {/* Feature Card – Native MCP */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    viewport={{ once: true }}
+                    className="md:col-span-4 rounded-[2rem] bg-[#1C1C1C] p-8 border border-white/5 flex flex-col justify-between min-h-[280px] transition-transform duration-200 hover:-translate-y-0.5 text-white"
+                >
+                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M4 6h16a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold mb-2">Native MCP Server</h3>
+                        <p className="text-zinc-400 text-sm leading-relaxed">
+                            Connect your IDE to W3DEPLOY via MCP. Let your local AI assistants instantly spin up previews and push to production.
+                        </p>
+                    </div>
+                </motion.div>
+
+                {/* Feature Card – Deployment History */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                    viewport={{ once: true }}
+                    className="md:col-span-4 rounded-[2rem] bg-[#B2A7FF] p-8 flex flex-col justify-between min-h-[280px] text-black transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                    <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center mb-6">
+                        <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold mb-2">Deployment History</h3>
+                        <p className="text-black/70 text-sm leading-relaxed">
+                            Track every release with timestamps, commit hashes, and immutable CIDs so you can audit rollouts instantly.
+                        </p>
+                    </div>
+                </motion.div>
             </div>
           </div>
         </section>
@@ -847,10 +911,10 @@ export function ModernDarkHeroSection() {
                   Step 1
                 </div>
                 <h3 className="text-3xl font-bold text-white">
-                  Weather Data Intelligence
+                  Build & Package Your App
                 </h3>
                 <p className="text-zinc-400 leading-relaxed">
-                  We use the OpenWeather API to fetch accurate, real-time weather data—forecasts, air quality, and alerts—personalized to the user's location.
+                  Prepare your project for decentralized deployment — bundle static assets, optimize output, and generate a content-addressed build ready for IPFS.
                 </p>
 
                 <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 flex items-center justify-between gap-6">
@@ -861,7 +925,7 @@ export function ModernDarkHeroSection() {
                         <div className="w-24 h-24 rounded-full border-t-4 border-purple-500 animate-spin"></div>
                       </div>
                     </div>
-                    <p className="text-center text-sm text-zinc-400">Analyzing current workflow...</p>
+                    <p className="text-center text-sm text-zinc-400">Preparing build for deployment...</p>
                   </div>
 
                   <div className="flex-1 space-y-3">
@@ -869,31 +933,31 @@ export function ModernDarkHeroSection() {
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>System check</span>
+                      <span>Build optimization</span>
                     </div>
                     <div className="flex items-center gap-3 text-zinc-300 text-sm">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
-                      <span>Process check</span>
+                      <span>Asset hashing</span>
                     </div>
                     <div className="flex items-center gap-3 text-zinc-300 text-sm">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      <span>Speed check</span>
+                      <span>Static export</span>
                     </div>
                     <div className="flex items-center gap-3 text-zinc-300 text-sm">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>Manual work</span>
+                      <span>Bundle verification</span>
                     </div>
                     <div className="flex items-center gap-3 text-zinc-300 text-sm">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      <span>Repetative task</span>
+                      <span>Ready for upload</span>
                     </div>
                   </div>
                 </div>
@@ -911,27 +975,29 @@ export function ModernDarkHeroSection() {
                   Step 2
                 </div>
                 <h3 className="text-3xl font-bold text-white">
-                  AI-Powered Response Generation
+                  Upload & Pin to IPFS
                 </h3>
                 <p className="text-zinc-400 leading-relaxed">
-                  We use Google Gemini 2.0 Flash to understand user input and generate intelligent, context-aware responses—allowing natural interaction with the weather agent.
+                  Your build is uploaded to IPFS and pinned across multiple providers — ensuring redundancy, reliability, and permanent content addressing.
                 </p>
 
                 <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6">
                   <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 font-mono text-sm">
                     <div className="flex items-center gap-2 mb-4 text-zinc-500">
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                       </svg>
-                      <span className="text-xs">AutomationTrigger</span>
+                      <span className="text-xs">deploy.log</span>
                     </div>
-                    <div className="space-y-2 text-zinc-400">
-                      <div><span className="text-purple-400">class</span> <span className="text-blue-400">AutomationTrigger</span>:</div>
-                      <div className="pl-4"><span className="text-purple-400">def</span> <span className="text-yellow-400">__init__</span>(self, threshold):</div>
-                      <div className="pl-8">self.threshold = threshold</div>
-                      <div className="pl-8">self.status = <span className="text-green-400">"inactive"</span></div>
-                      <div className="pl-4 mt-3"><span className="text-purple-400">def</span> <span className="text-yellow-400">check_trigger</span>(self, value):</div>
-                      <div className="pl-8"><span className="text-purple-400">if</span> val &gt;= self.threshold:</div>
+                    <div className="space-y-1 text-zinc-400 font-mono text-[13px] leading-tight">
+                      <div><span className="text-zinc-500"># Upload build to IPFS</span></div>
+                      <div>Uploading dist/ → <span className="text-blue-400">bafybeig3...</span></div>
+                      <div className="pt-2"><span className="text-zinc-500"># Pinning across providers</span></div>
+                      <div>Pinata ✓</div>
+                      <div>Web3.Storage ✓</div>
+                      <div>Fallback ✓</div>
+                      <div className="pt-2"><span className="text-zinc-500"># Deployment CID generated</span></div>
+                      <div>CID: <span className="text-purple-400">bafybeig3...</span></div>
                     </div>
                   </div>
                 </div>
