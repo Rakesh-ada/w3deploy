@@ -331,7 +331,7 @@ export function ModernDarkHeroSection() {
   return (
     <>
       <HeroHeader />
-      <main className="overflow-hidden bg-background">
+      <main className="overflow-clip bg-background">
         <div
           aria-hidden
           className="z-[2] absolute inset-0 pointer-events-none isolate opacity-50 contain-strict hidden lg:block"
@@ -476,10 +476,12 @@ export function ModernDarkHeroSection() {
           </div>
         </section>
 
-        {/* Deployment Terminal Section */}
-        <section className="bg-gradient-to-b from-blue-50/50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 py-24 md:py-32">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        {/* Sticky Scroll Container */}
+        <div className="relative w-full">
+          {/* Deployment Terminal Section */}
+          <section className="sticky top-0 h-[100dvh] w-full flex flex-col justify-center bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 z-10 overflow-hidden transform-gpu">
+            <div className="mx-auto max-w-7xl px-6 w-full">
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               {/* Left Content */}
               <div className="space-y-6">
                 <h2 className="text-4xl md:text-5xl font-bold text-foreground">
@@ -562,10 +564,10 @@ export function ModernDarkHeroSection() {
           </div>
         </section>
 
-        {/* Config On-Chain Section */}
-        <section className="bg-gradient-to-b from-pink-100 to-pink-50 dark:from-pink-950/30 dark:to-pink-900/20 py-24 md:py-32">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Config On-Chain Section */}
+          <section className="sticky top-0 h-[100dvh] w-full flex flex-col justify-center bg-gradient-to-b from-pink-100 to-pink-50 dark:from-pink-950 dark:to-pink-900 z-20 overflow-hidden border-t-2 border-white/5 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] transform-gpu">
+            <div className="mx-auto max-w-7xl px-6 w-full">
+              <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               {/* Left Content */}
               <div className="space-y-6">
                 <div className="flex gap-2 mb-6">
@@ -644,9 +646,9 @@ export function ModernDarkHeroSection() {
           </div>
         </section>
 
-        {/* True Ownership Section */}
-        <section className="bg-gradient-to-b from-green-100 to-green-50 dark:from-green-950/30 dark:to-green-900/20 py-24 md:py-32">
-          <div className="mx-auto max-w-7xl px-6">
+          {/* True Ownership Section */}
+          <section className="sticky top-0 h-[100dvh] w-full flex flex-col justify-center bg-gradient-to-b from-green-100 to-green-50 dark:from-green-950 dark:to-green-900 z-30 overflow-hidden border-t-2 border-white/5 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] transform-gpu">
+            <div className="mx-auto max-w-7xl px-6 w-full">
             {/* Header */}
             <div className="mb-16 space-y-6">
               <div className="flex gap-2 mb-6">
@@ -738,6 +740,7 @@ export function ModernDarkHeroSection() {
             </div>
           </div>
         </section>
+      </div>
 
         {/* How It Works Section */}
         <section className="bg-black py-24 md:py-32">
