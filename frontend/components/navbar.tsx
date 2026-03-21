@@ -6,7 +6,7 @@ import { clearToken, getToken, getTokenExpiryMs, User, getMe, logout } from "@/l
 import { useRouter } from "next/navigation";
 
 const INACTIVITY_LOGOUT_MS = 30 * 60 * 1000;
-const LAST_ACTIVITY_KEY = "w3deploy_last_activity";
+const LAST_ACTIVITY_KEY = "algoflow_last_activity";
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
@@ -77,7 +77,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
-      if (event.key !== "w3deploy_token") return;
+      if (event.key !== "algoflow_token") return;
       if (event.newValue) return;
       setUser(null);
       router.push("/login");
@@ -113,20 +113,27 @@ export default function Navbar() {
       {/* Logo */}
       <Link href="/" className="flex items-center space-x-2">
         <span style={{ fontFamily: 'var(--font-bitcount)' }} className="text-4xl tracking-tight text-white">
-          W3DEPLOY
+          ALGOFLOW
         </span>
       </Link>
 
       {/* Right side */}
       <div className="flex items-center space-x-6">
         <a
-          href="https://github.com/ishikabhoyar/ethmumbai"
+          href="#"
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm font-medium text-tg-muted cursor-pointer hover:text-white transition-colors tracking-widest"
         >
           DOCS
         </a>
+
+        <Link
+          href="/mcp"
+          className="text-sm font-medium text-tg-muted cursor-pointer hover:text-white transition-colors tracking-widest"
+        >
+          MCP
+        </Link>
 
         {user ? (
           <div className="flex items-center space-x-4">

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -488,14 +488,14 @@ function DashboardContent() {
 
         <footer className="mt-20 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-tg-muted text-xs font-medium">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <span>© 2024 W3DEPLOY FOUNDATION</span>
+            <span>© 2024 ALGOFLOW FOUNDATION</span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="hover:text-white cursor-pointer transition-colors">TERMS OF SERVICE</span>
           </div>
           <div className="flex items-center space-x-6">
             <a href="#" className="hover:text-white transition-colors">TWITTER</a>
             <a href="#" className="hover:text-white transition-colors">GITHUB</a>
-            <a href="#" className="hover:text-white transition-colors text-tg-lime">SYSTEM STATUS: OPTIMAL</a>
+            <a href="#" className="hover:text-white transition-colors text-tg-lime">STATUS: OPTIMAL</a>
           </div>
         </footer>
       </main>

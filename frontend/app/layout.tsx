@@ -29,9 +29,9 @@ const bitcountPropDoubleInk = Bitcount_Prop_Double_Ink({
 });
 
 export const metadata: Metadata = {
-  title: "W3DEPLOY - Web3 Vercel",
+  title: "ALGOFLOW - Web3 Vercel",
   description:
-    "A censorship-resistant deployment platform where sites live on IPFS. Deploy directly via MCP connection to w3deploy. No servers. No censorship. Unstoppable.",
+    "A censorship-resistant deployment platform where sites live on IPFS. Deploy directly via MCP connection to algoflow. No servers. No censorship. Unstoppable.",
 };
 
 export default function RootLayout({

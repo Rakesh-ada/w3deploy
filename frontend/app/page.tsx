@@ -82,7 +82,7 @@ export default function Home() {
             <div>
               <h3 className="font-display text-xl font-bold mb-2">Native MCP Server</h3>
               <p className="text-tg-muted text-sm leading-relaxed">
-                Connect your IDE to W3DEPLOY via MCP. Let your local AI assistants instantly spin up previews and push to production.
+                Connect your IDE to ALGOFLOW via MCP and let AI instantly spin up previews and deploy.
               </p>
             </div>
           </div>
@@ -97,7 +97,7 @@ export default function Home() {
             <div>
               <h3 className="font-display text-xl font-bold mb-2">Deployment History</h3>
               <p className="text-tg-black/70 text-sm leading-relaxed">
-                Track every release with timestamps, commit hashes, and immutable CIDs so you can audit rollouts instantly.
+                Track releases with timestamps, commit hashes, and immutable CIDs to instantly audit rollouts.
               </p>
             </div>
           </div>
@@ -110,17 +110,17 @@ export default function Home() {
                 {
                   step: "01",
                   title: "Connect your repo",
-                  desc: "Authenticate with GitHub and link your repository. W3DEPLOY registers a webhook to listen for new pushes.",
+                  desc: "Authenticate with GitHub and link your repository to automatically listen for pushes.",
                 },
                 {
                   step: "02",
                   title: "Push to deploy",
-                  desc: "On every push to your configured branch, W3DEPLOY builds your project and pins the output to IPFS automatically.",
+                  desc: "Each push to your branch automatically builds your project and pins the output to IPFS.",
                 },
                 {
                   step: "03",
                   title: "Agent Deployment",
-                  desc: "Alternatively, use your IDE's built-in MCP to let our agents build and deploy your project automatically by chatting.",
+                  desc: "Use your IDE's built-in MCP to let our AI agents build and deploy your project automatically via chat.",
                 },
               ].map(({ step, title, desc }) => (
                 <div key={step} className="space-y-4">
@@ -146,9 +146,9 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center space-x-4 shrink-0">
-              <Link href="/login">
+              <Link href="/mcp">
                 <button className="bg-tg-lavender text-tg-black px-8 py-4 rounded-full font-bold text-sm tracking-wide hover:opacity-90 transition-all font-display">
-                  DEPLOY NOW →
+                  CONNECT NOW →
                 </button>
               </Link>
             </div>
@@ -158,14 +158,14 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-20 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-tg-muted text-xs font-medium">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <span>© 2024 W3DEPLOY FOUNDATION</span>
+            <span>© 2024 ALGOFLOW FOUNDATION</span>
             <span className="w-1 h-1 bg-white/20 rounded-full" />
             <span className="hover:text-white cursor-pointer transition-colors">TERMS OF SERVICE</span>
           </div>
           <div className="flex items-center space-x-6">
             <a href="#" className="hover:text-white transition-colors">TWITTER</a>
             <a href="#" className="hover:text-white transition-colors">GITHUB</a>
-            <a href="#" className="hover:text-white transition-colors text-tg-lime">SYSTEM STATUS: OPTIMAL</a>
+            <a href="#" className="hover:text-white transition-colors text-tg-lime">STATUS: OPTIMAL</a>
           </div>
         </footer>
       </main>
