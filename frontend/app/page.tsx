@@ -2,18 +2,14 @@
 "use client";
 
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, Variants, TargetAndTransition } from "framer-motion";
-import { ArrowRight, ChevronRight, Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, Variants } from "framer-motion";
+import { ArrowRight, Menu, X, Github, Twitter, Mail, FileCode } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
 import LightRays from "../components/LightRays";
 import { AnimatedBeamDemo } from "../components/animated-beam-demo";
-
-// Utils
-function cn(...inputs: (string | undefined | null | false)[]) {
-  return inputs.filter(Boolean).join(" ");
-}
 
 // Button Component
 const buttonVariants = cva(
@@ -318,6 +314,339 @@ const transitionVariants = {
       },
     },
   },
+};
+
+// BackgroundGradientAnimation Component
+const BackgroundGradientAnimation = ({
+  gradientBackgroundStart = "rgb(108, 0, 162)",
+  gradientBackgroundEnd = "rgb(0, 17, 82)",
+  firstColor = "18, 113, 255",
+  secondColor = "221, 74, 255",
+  thirdColor = "100, 220, 255",
+  fourthColor = "200, 50, 50",
+  fifthColor = "180, 180, 50",
+  pointerColor = "140, 100, 255",
+  size = "80%",
+  blendingValue = "hard-light",
+  children,
+  className,
+  interactive = true,
+  containerClassName,
+}: {
+  gradientBackgroundStart?: string;
+  gradientBackgroundEnd?: string;
+  firstColor?: string;
+  secondColor?: string;
+  thirdColor?: string;
+  fourthColor?: string;
+  fifthColor?: string;
+  pointerColor?: string;
+  size?: string;
+  blendingValue?: string;
+  children?: React.ReactNode;
+  className?: string;
+  interactive?: boolean;
+  containerClassName?: string;
+}) => {
+  const interactiveRef = React.useRef<HTMLDivElement>(null);
+  const [curX, setCurX] = useState(0);
+  const [curY, setCurY] = useState(0);
+  const [tgX, setTgX] = useState(0);
+  const [tgY, setTgY] = useState(0);
+
+  useEffect(() => {
+    document.body.style.setProperty("--gradient-background-start", gradientBackgroundStart);
+    document.body.style.setProperty("--gradient-background-end", gradientBackgroundEnd);
+    document.body.style.setProperty("--first-color", firstColor);
+    document.body.style.setProperty("--second-color", secondColor);
+    document.body.style.setProperty("--third-color", thirdColor);
+    document.body.style.setProperty("--fourth-color", fourthColor);
+    document.body.style.setProperty("--fifth-color", fifthColor);
+    document.body.style.setProperty("--pointer-color", pointerColor);
+    document.body.style.setProperty("--size", size);
+    document.body.style.setProperty("--blending-value", blendingValue);
+  }, []);
+
+  useEffect(() => {
+    function move() {
+      if (!interactiveRef.current) {
+        return;
+      }
+      setCurX(curX + (tgX - curX) / 20);
+      setCurY(curY + (tgY - curY) / 20);
+      interactiveRef.current.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+    }
+    move();
+  }, [tgX, tgY, curX, curY]);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (interactiveRef.current) {
+      const rect = interactiveRef.current.getBoundingClientRect();
+      setTgX(event.clientX - rect.left);
+      setTgY(event.clientY - rect.top);
+    }
+  };
+
+  const [isSafari, setIsSafari] = useState(false);
+  useEffect(() => {
+    setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
+  }, []);
+
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden bg-[linear-gradient(40deg,var(--gradient-background-start),var(--gradient-background-end))]",
+        containerClassName
+      )}
+    >
+      <svg className="hidden">
+        <defs>
+          <filter id="blurMe">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+              result="goo"
+            />
+            <feBlend in="SourceGraphic" in2="goo" />
+          </filter>
+        </defs>
+      </svg>
+      <div className={cn("", className)}>{children}</div>
+      <div
+        className={cn(
+          "gradients-container h-full w-full blur-lg",
+          isSafari ? "blur-2xl" : "[filter:url(#blurMe)_blur(40px)]"
+        )}
+      >
+        <div
+          className={cn(
+            `absolute [background:radial-gradient(circle_at_center,_var(--first-color)_0,_var(--first-color)_50%)_no-repeat]`,
+            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `[transform-origin:center_center]`,
+            `animate-first`,
+            `opacity-100`
+          )}
+        ></div>
+        <div
+          className={cn(
+            `absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.8)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]`,
+            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `[transform-origin:calc(50%-400px)]`,
+            `animate-second`,
+            `opacity-100`
+          )}
+        ></div>
+        <div
+          className={cn(
+            `absolute [background:radial-gradient(circle_at_center,_rgba(var(--third-color),_0.8)_0,_rgba(var(--third-color),_0)_50%)_no-repeat]`,
+            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `[transform-origin:calc(50%+400px)]`,
+            `animate-third`,
+            `opacity-100`
+          )}
+        ></div>
+        <div
+          className={cn(
+            `absolute [background:radial-gradient(circle_at_center,_rgba(var(--fourth-color),_0.8)_0,_rgba(var(--fourth-color),_0)_50%)_no-repeat]`,
+            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `[transform-origin:calc(50%-200px)]`,
+            `animate-fourth`,
+            `opacity-70`
+          )}
+        ></div>
+        <div
+          className={cn(
+            `absolute [background:radial-gradient(circle_at_center,_rgba(var(--fifth-color),_0.8)_0,_rgba(var(--fifth-color),_0)_50%)_no-repeat]`,
+            `[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]`,
+            `[transform-origin:calc(50%-800px)_calc(50%+800px)]`,
+            `animate-fifth`,
+            `opacity-100`
+          )}
+        ></div>
+
+        {interactive && (
+          <div
+            ref={interactiveRef}
+            onMouseMove={handleMouseMove}
+            className={cn(
+              `absolute [background:radial-gradient(circle_at_center,_rgba(var(--pointer-color),_0.8)_0,_rgba(var(--pointer-color),_0)_50%)_no-repeat]`,
+              `[mix-blend-mode:var(--blending-value)] w-full h-full -top-1/2 -left-1/2`,
+              `opacity-70`
+            )}
+          ></div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// W3DeployCTA Component
+interface W3DeployCTAProps {
+  eyebrow?: string;
+  heading?: string;
+  subheading?: string;
+  primaryButtonText?: string;
+  primaryButtonUrl?: string;
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
+  showSecondaryButton?: boolean;
+}
+
+const W3DeployCTA: React.FC<W3DeployCTAProps> = ({
+  eyebrow = "READY TO DEPLOY",
+  heading = "Deploy unstoppable apps today",
+  subheading = "From build to global access — deploy, pin, and connect your domain in minutes. No downtime. No lock-in.",
+  primaryButtonText = "Start deploying",
+  primaryButtonUrl = "#",
+  secondaryButtonText = "View docs",
+  secondaryButtonUrl = "#",
+  showSecondaryButton = true,
+}) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <section className="relative w-full py-20 md:py-32 px-4 bg-[#0A0A0A] overflow-hidden">
+      {/* Remove or comment out the gradient overlays that might be affecting the background */}
+      {/* <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(139,92,246,0.15)_0%,_transparent_50%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(139,92,246,0.1)_0%,_transparent_50%)] pointer-events-none" /> */}
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative max-w-4xl mx-auto">
+        <div className="relative rounded-2xl border border-white/5 bg-gradient-to-br from-black/40 via-black/60 to-black/40 backdrop-blur-xl p-12 md:p-16 shadow-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+
+          <BackgroundGradientAnimation
+            gradientBackgroundStart="rgb(10, 10, 10)"
+            gradientBackgroundEnd="rgb(20, 10, 30)"
+            firstColor="139, 92, 246"
+            secondColor="168, 85, 247"
+            thirdColor="124, 58, 237"
+            fourthColor="109, 40, 217"
+            fifthColor="147, 51, 234"
+            pointerColor="139, 92, 246"
+            size="60%"
+            blendingValue="overlay"
+            containerClassName="absolute inset-0 opacity-30"
+            interactive={true}
+          />
+
+          <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+            {eyebrow && (
+              <div className="inline-flex items-center justify-center">
+                <span className="text-xs md:text-sm font-semibold tracking-[0.2em] uppercase text-purple-300/80">
+                  {eyebrow}
+                </span>
+              </div>
+            )}
+
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-3xl">
+              {heading}
+            </h2>
+
+            <p className="text-base md:text-lg text-gray-400 max-w-2xl leading-relaxed">
+              {subheading}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
+              <a
+                href={primaryButtonUrl}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="group relative"
+              >
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 via-purple-500 to-purple-600 rounded-xl blur opacity-60 group-hover:opacity-100 transition duration-300 animate-pulse" />
+                <Button
+                  size="lg"
+                  className="relative bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold px-8 py-6 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-105 border-0"
+                >
+                  {primaryButtonText}
+                  <ArrowRight
+                    className={cn(
+                      "ml-2 h-5 w-5 transition-transform duration-300",
+                      isHovered && "translate-x-1"
+                    )}
+                  />
+                </Button>
+              </a>
+
+              {showSecondaryButton && (
+                <a href={secondaryButtonUrl}>
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    className="text-gray-300 hover:text-white hover:bg-white/5 font-medium px-8 py-6 rounded-xl transition-all duration-300 border border-white/10 hover:border-white/20"
+                  >
+                    <FileCode className="mr-2 h-5 w-5" />
+                    {secondaryButtonText}
+                  </Button>
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx global>{`
+        @keyframes moveHorizontal {
+          0% {
+            transform: translateX(-50%) translateY(-10%);
+          }
+          50% {
+            transform: translateX(50%) translateY(10%);
+          }
+          100% {
+            transform: translateX(-50%) translateY(-10%);
+          }
+        }
+        @keyframes moveInCircle {
+          0% {
+            transform: rotate(0deg);
+          }
+          50% {
+            transform: rotate(180deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes moveVertical {
+          0% {
+            transform: translateY(-50%);
+          }
+          50% {
+            transform: translateY(50%);
+          }
+          100% {
+            transform: translateY(-50%);
+          }
+        }
+        .animate-first {
+          animation: moveVertical 30s ease infinite;
+        }
+        .animate-second {
+          animation: moveInCircle 20s reverse infinite;
+        }
+        .animate-third {
+          animation: moveInCircle 40s linear infinite;
+        }
+        .animate-fourth {
+          animation: moveHorizontal 40s ease infinite;
+        }
+        .animate-fifth {
+          animation: moveInCircle 20s ease infinite;
+        }
+      `}</style>
+    </section>
+  );
 };
 
 // Main Hero Section Component
@@ -1649,115 +1978,234 @@ export function ModernDarkHeroSection() {
           `}</style>
         </section>
 
-        {/* Glossy Purple CTA Section */}
-        <section className="py-16 md:py-20" style={{ backgroundColor: '#0A0A0A' }}>
-          <div className="mx-auto max-w-7xl px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900 p-12 md:p-20 text-center shadow-2xl"
-            >
-              {/* Glossy overlay effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+        {/* W3Deploy CTA Section */}
+        <W3DeployCTA 
+          eyebrow="READY TO DEPLOY"
+          heading="Let's See AlgoFlow in Action"
+          subheading="Book a Call Today and Start Automating. Deploy unstoppable apps with decentralized infrastructure in minutes."
+          primaryButtonText="Book a free call"
+          primaryButtonUrl="#"
+          secondaryButtonText="View docs"
+          secondaryButtonUrl="#"
+          showSecondaryButton={true}
+        />
 
-              {/* Glow effects */}
-              <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-400/30 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl"></div>
+        {/* W3Deploy Footer */}
+        <footer className="relative w-full bg-[#0A0A0A] overflow-hidden">
+          {/* Subtle Purple Radial Gradient Glow */}
+          <div
+            className="absolute inset-0 z-0 opacity-30"
+            style={{
+              backgroundImage: `radial-gradient(circle 800px at 20% 0%, rgba(139, 92, 246, 0.15), transparent 50%)`,
+            }}
+          />
 
-              <div className="relative z-10 space-y-6">
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white">
-                  Let See AlgoFlow in Action
-                </h2>
-                <p className="text-xl text-purple-100 max-w-2xl mx-auto">
-                  Book a Call Today and Start Automating
-                </p>
-                <div className="pt-4">
-                  <Button
-                    size="lg"
-                    className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
-                  >
-                    Book a free call
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
+          {/* Grid Pattern Overlay */}
+          <div
+            className="absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px)`,
+              backgroundSize: "48px 48px",
+            }}
+          />
 
-        {/* Footer Section */}
-        <footer className="bg-zinc-950 text-white py-16 md:py-20">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-              {/* Brand Column */}
-              <div className="space-y-4">
-                <Logo className="h-6 w-auto" />
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  AlgoFlow — Automate Smarter, Optimize Faster, and Grow Stronger.
-                </p>
-                <div className="space-y-2">
-                  <p className="text-sm text-zinc-300 font-semibold">Join our newsletter</p>
-                  <div className="flex gap-2">
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="flex-1 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                    <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white">
-                      Subscribe
-                    </Button>
+          {/* Content Container */}
+          <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+            {/* Top Border with Purple Tint */}
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+
+            {/* Main Footer Content */}
+            <div className="py-16 lg:py-20">
+              <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
+                {/* Brand Section */}
+                <div className="lg:col-span-4">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">AF</span>
+                    </div>
+                    <span className="text-xl font-semibold text-white tracking-tight">AlgoFlow</span>
+                  </div>
+
+                  <p className="text-[#A1A1AA] text-[15px] leading-relaxed mb-8 max-w-sm">
+                    Deploy unstoppable apps with decentralized infrastructure. Built on IPFS & ENS for true ownership.
+                  </p>
+
+                  {/* Social Icons */}
+                  <div className="flex items-center gap-4">
+                    <a
+                      href="https://github.com"
+                      aria-label="GitHub"
+                      className="group relative h-10 w-10 rounded-lg border border-white/5 bg-white/[0.02] flex items-center justify-center transition-all duration-300 hover:border-purple-500/30 hover:bg-purple-500/5"
+                    >
+                      <Github className="h-4 w-4 text-[#A1A1AA] transition-colors duration-300 group-hover:text-white" />
+                      <div className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-purple-500/5 blur-sm" />
+                    </a>
+                    <a
+                      href="https://twitter.com"
+                      aria-label="Twitter"
+                      className="group relative h-10 w-10 rounded-lg border border-white/5 bg-white/[0.02] flex items-center justify-center transition-all duration-300 hover:border-purple-500/30 hover:bg-purple-500/5"
+                    >
+                      <Twitter className="h-4 w-4 text-[#A1A1AA] transition-colors duration-300 group-hover:text-white" />
+                      <div className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-purple-500/5 blur-sm" />
+                    </a>
+                    <a
+                      href="#discord"
+                      aria-label="Discord"
+                      className="group relative h-10 w-10 rounded-lg border border-white/5 bg-white/[0.02] flex items-center justify-center transition-all duration-300 hover:border-purple-500/30 hover:bg-purple-500/5"
+                    >
+                      <Mail className="h-4 w-4 text-[#A1A1AA] transition-colors duration-300 group-hover:text-white" />
+                      <div className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-purple-500/5 blur-sm" />
+                    </a>
                   </div>
                 </div>
-              </div>
 
-              {/* Links Column */}
-              <div>
-                <h3 className="text-white font-semibold mb-4">Links</h3>
-                <ul className="space-y-3">
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Services</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Process</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Case studies</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Benefits</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Pricing</a></li>
-                </ul>
-              </div>
+                {/* Links Sections */}
+                <div className="lg:col-span-8">
+                  <div className="grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-8">
+                    {/* Product Section */}
+                    <div>
+                      <h3 className="text-[13px] font-semibold text-white/90 tracking-wider uppercase mb-6 letter-spacing-[0.05em]">
+                        PRODUCT
+                      </h3>
+                      <ul className="space-y-4">
+                        <li>
+                          <a
+                            href="#features"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Features
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#deployment"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Deployment Flow
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#pricing"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Pricing
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#integrations"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Integrations
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
 
-              {/* Pages Column */}
-              <div>
-                <h3 className="text-white font-semibold mb-4">Pages</h3>
-                <ul className="space-y-3">
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Home</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">About</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Blog</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Contact</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">404</a></li>
-                </ul>
-              </div>
+                    {/* Resources Section */}
+                    <div>
+                      <h3 className="text-[13px] font-semibold text-white/90 tracking-wider uppercase mb-6 letter-spacing-[0.05em]">
+                        RESOURCES
+                      </h3>
+                      <ul className="space-y-4">
+                        <li>
+                          <a
+                            href="#docs"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Documentation
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#guides"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Guides
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#blog"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Blog
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#support"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Support
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
 
-              {/* Socials Column */}
-              <div>
-                <h3 className="text-white font-semibold mb-4">Socials</h3>
-                <ul className="space-y-3">
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Linkedin</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Github</a></li>
-                  <li><a href="#" className="text-zinc-400 hover:text-white text-sm transition-colors">Twitter</a></li>
-                </ul>
+                    {/* Company Section */}
+                    <div>
+                      <h3 className="text-[13px] font-semibold text-white/90 tracking-wider uppercase mb-6 letter-spacing-[0.05em]">
+                        COMPANY
+                      </h3>
+                      <ul className="space-y-4">
+                        <li>
+                          <a
+                            href="#about"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            About
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#contact"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Contact
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#privacy"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Privacy Policy
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            href="#terms"
+                            className="group inline-flex items-center text-[15px] text-[#A1A1AA] transition-all duration-200 hover:text-white hover:translate-x-0.5"
+                          >
+                            Terms of Service
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Bottom Bar */}
-            <div className="border-t border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-zinc-500 text-sm">
-                © 2024 AlgoFlow. All rights reserved.
-              </p>
-              <div className="flex gap-6">
-                <a href="#" className="text-zinc-500 hover:text-white text-sm transition-colors">Privacy Policy</a>
-                <a href="#" className="text-zinc-500 hover:text-white text-sm transition-colors">Terms of Service</a>
+            <div className="border-t border-white/5 py-8">
+              <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                <p className="text-sm text-[#A1A1AA]">© 2026 AlgoFlow. All rights reserved.</p>
+                <p className="text-xs text-[#71717A]">Built on IPFS & ENS</p>
               </div>
             </div>
           </div>
+
+          {/* Optional: Subtle Blurred Purple Blob */}
+          <div
+            className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full opacity-20 blur-3xl"
+            style={{
+              background: "radial-gradient(circle, rgba(139, 92, 246, 0.3), transparent 70%)",
+            }}
+          />
         </footer>
       </main>
     </>
