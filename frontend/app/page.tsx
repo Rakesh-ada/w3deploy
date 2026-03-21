@@ -223,7 +223,7 @@ const HeroHeader = () => {
 
   return (
     <header>
-      <nav data-state={menuState && "active"} className="fixed z-20 w-full px-2 group">
+      <nav data-state={menuState && "active"} className="fixed z-50 w-full px-2 group">
         <div
           className={cn(
             "mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12",
@@ -314,6 +314,46 @@ const transitionVariants = {
       },
     },
   },
+};
+
+// Custom Typewriter Text Component
+const TypewriterText = ({ text }: { text: string }) => {
+  const [displayedText, setDisplayedText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!isDeleting) {
+        // Typing phase
+        if (currentIndex < text.length) {
+          setDisplayedText(prev => prev + text[currentIndex]);
+          setCurrentIndex(prev => prev + 1);
+        } else {
+          // Pause before deleting
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        // Deleting phase
+        if (currentIndex > 0) {
+          setDisplayedText(prev => prev.slice(0, -1));
+          setCurrentIndex(prev => prev - 1);
+        } else {
+          // Pause before typing again
+          setTimeout(() => setIsDeleting(false), 500);
+        }
+      }
+    }, isDeleting ? 50 : 80); // Faster deletion, normal typing speed
+
+    return () => clearTimeout(timeout);
+  }, [currentIndex, isDeleting, text]);
+
+  return (
+    <span className="text-6xl md:text-7xl xl:text-[5.25rem] font-bold text-foreground">
+      {displayedText}
+      <span className="animate-pulse text-white">|</span>
+    </span>
+  );
 };
 
 // BackgroundGradientAnimation Component
@@ -730,7 +770,7 @@ export function ModernDarkHeroSection() {
                   </a>
 
                   <h1 className="mt-8 max-w-4xl mx-auto text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem] text-foreground">
-                    Deploy Web2 Apps to Web3 — Instantly
+                    <TypewriterText text="Deploy Web2 Apps to Web3 — Instantly" />
                   </h1>
                   <p className="mx-auto mt-8 max-w-2xl text-balance text-lg text-muted-foreground">
                     AlgoFlow uses AI to convert, optimize, and deploy your apps to IPFS with verifiable on-chain ownership.
@@ -807,6 +847,11 @@ export function ModernDarkHeroSection() {
               <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 {/* Left Content */}
                 <div className="space-y-6">
+                  <div className="flex gap-2 mb-6">
+                    <div className="w-4 h-4 rounded bg-blue-900"></div>
+                    <div className="w-4 h-4 rounded bg-blue-400/40"></div>
+                    <div className="w-4 h-4 rounded bg-blue-400/40"></div>
+                  </div>
                   <h2 className="text-4xl md:text-5xl font-bold text-foreground">
                     Farewell to downtime.
                   </h2>
@@ -991,12 +1036,6 @@ export function ModernDarkHeroSection() {
 
               {/* Comparison Cards */}
               <div className="relative">
-                {/* Dotted Background */}
-                <div className="absolute inset-0 opacity-20" style={{
-                  backgroundImage: 'radial-gradient(circle, #10b981 1px, transparent 1px)',
-                  backgroundSize: '20px 20px'
-                }}></div>
-
                 <div className="relative grid md:grid-cols-2 gap-8">
                   {/* Web2 Hosting Card */}
                   <motion.div
