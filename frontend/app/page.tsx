@@ -917,6 +917,15 @@ export function ModernDarkHeroSection() {
                       <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-600/20 to-purple-900/20 blur-xl"></div>
                       <div className="relative w-full h-full rounded-full border border-purple-500/30 flex items-center justify-center">
                         <div className="w-24 h-24 rounded-full border-t-4 border-purple-500 animate-spin"></div>
+                        {/* Package icon centered over the spinner */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-9 h-9 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16.5 9.4l-9-5.19" />
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <path d="M3.29 7L12 12l8.71-5" />
+                            <path d="M12 22V12" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                     <p className="text-center text-sm text-zinc-400">Preparing build for deployment...</p>
