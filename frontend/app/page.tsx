@@ -8,6 +8,7 @@ import { ArrowRight, ChevronRight, Menu, X } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import LightRays from "../components/LightRays";
+import { AnimatedBeamDemo } from "../components/animated-beam-demo";
 
 // Utils
 function cn(...inputs: (string | undefined | null | false)[]) {
@@ -1015,36 +1016,14 @@ export function ModernDarkHeroSection() {
                   Step 3
                 </div>
                 <h3 className="text-3xl font-bold text-white">
-                  Seamless Integration
+                  Publish & Connect Your Domain
                 </h3>
                 <p className="text-zinc-400 leading-relaxed">
-                  We integrate your weather assistant with Gmail and Slack, enabling automatic delivery of weather updates via email and instant messaging.
+                  Your deployment is pinned to IPFS and linked to an ENS domain — making your app accessible, permanent, and censorship-resistant across gateways.
                 </p>
 
-                <div className="bg-black/50 border border-zinc-800 rounded-2xl p-8 flex items-center justify-center gap-12">
-                  <div className="text-center">
-                    <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-xl">
-                      <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                      </svg>
-                    </div>
-                    <p className="text-sm text-zinc-400">Our solution</p>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <div className="w-24 h-0.5 bg-zinc-700"></div>
-                    <div className="w-24 h-0.5 bg-zinc-700"></div>
-                    <div className="w-24 h-0.5 bg-zinc-700"></div>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-xl">
-                      <svg className="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                      </svg>
-                    </div>
-                    <p className="text-sm text-zinc-400">Your stack</p>
-                  </div>
+                <div className="bg-black/50 border border-zinc-800 rounded-2xl flex items-center justify-center overflow-hidden">
+                  <AnimatedBeamDemo />
                 </div>
               </motion.div>
 
@@ -1060,57 +1039,56 @@ export function ModernDarkHeroSection() {
                   Step 4
                 </div>
                 <h3 className="text-3xl font-bold text-white">
-                  Continuous Adaptation
+                  Update & Stay Live
                 </h3>
                 <p className="text-zinc-400 leading-relaxed">
-                  We optimize the assistant through regular data syncing, behavior tuning, and interaction analysis to keep your alerts timely, relevant, and user-friendly.
+                  Every new deploy updates your IPFS content and automatically syncs with ENS/IPNS — ensuring your app stays live without downtime or manual intervention.
                 </p>
 
                 <div className="bg-black/50 border border-zinc-800 rounded-2xl p-6 space-y-4">
+                  {/* Item 1 */}
                   <div className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                      </svg>
-                      <div>
-                        <p className="text-white text-sm font-semibold">Chatbot system</p>
-                        <p className="text-zinc-500 text-xs">Efficiency will increase by 20%</p>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
                       </div>
-                    </div>
-                    <div className="w-8 h-8 rounded-full border-2 border-purple-500 flex items-center justify-center">
-                      <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                      <div>
+                        <p className="text-white text-sm font-semibold">Latest deployment synced</p>
+                        <p className="text-zinc-500 text-xs">IPFS CID updated successfully</p>
+                      </div>
                     </div>
                   </div>
 
+                  {/* Item 2 */}
                   <div className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                        </svg>
+                      </div>
                       <div>
-                        <p className="text-white text-sm font-semibold">Workflow system</p>
-                        <p className="text-zinc-500 text-xs">Update available.</p>
+                        <p className="text-white text-sm font-semibold">Domain pointing to latest version</p>
+                        <p className="text-zinc-500 text-xs">Auto-updated via IPNS</p>
                       </div>
                     </div>
-                    <svg className="w-6 h-6 text-purple-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
                   </div>
 
+                  {/* Item 3 */}
                   <div className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-xl border border-zinc-800">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                        <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
                       <div>
-                        <p className="text-white text-sm font-semibold">Sales system</p>
-                        <p className="text-zinc-500 text-xs">Up to date</p>
+                        <p className="text-white text-sm font-semibold">Always live & accessible</p>
+                        <p className="text-zinc-500 text-xs">Served via decentralized gateways</p>
                       </div>
                     </div>
-                    <svg className="w-6 h-6 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 13l4 4L19 7" />
-                    </svg>
                   </div>
                 </div>
               </motion.div>
