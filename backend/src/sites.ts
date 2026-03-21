@@ -1,4 +1,4 @@
-﻿import { Hono } from "hono";
+import { Hono } from "hono";
 import { verify } from "hono/jwt";
 import { PinataSDK } from "pinata-web3";
 import {
@@ -10,13 +10,13 @@ import {
   getMaxConcurrent,
   removeProjectByDomainForUser,
   isValidWalletAddress,
+  type Deployment,
 } from "./db.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "w3deploy-super-secret-key-change-me";
 const PINATA_GATEWAY = process.env.PINATA_GATEWAY || "gateway.pinata.cloud";
 const PINATA_JWT = process.env.PINATA_JWT || "";
-const BACKEND_URL = process.env.BACKEND_URL || "";
-const BASE_DOMAIN = (process.env.BASE_DOMAIN || "web3deploy.me").trim().toLowerCase();
+const DIRECT_GATEWAY_BASE = (process.env.DIRECT_GATEWAY_BASE || `https://${PINATA_GATEWAY}/ipfs`).trim();
 
 export const sitesRouter = new Hono();
 
@@ -24,20 +24,6 @@ const pinata = new PinataSDK({
   pinataJwt: PINATA_JWT,
   pinataGateway: PINATA_GATEWAY,
 });
-
-function stripTrailingSlashes(value: string): string {
-  return value.replace(/\/+$/, "");
-}
-
-function normalizeProjectLabel(value: string): string {
-  const normalized = value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  return normalized || "project";
-}
 
 function normalizeWalletAddress(value: string): string {
   return value.trim().toUpperCase();
@@ -50,29 +36,52 @@ function getWalletFromRequest(c: any): string | null {
   return normalizeWalletAddress(wallet);
 }
 
-function getBackendBaseUrl(c: any): string {
-  const configured = BACKEND_URL.trim();
-  if (configured) {
-    return stripTrailingSlashes(configured);
-  }
+function stripTrailingSlashes(value: string): string {
+  return value.replace(/\/+$/, "");
+}
 
+function isPublicPinataGatewayUrl(value: string): boolean {
   try {
-    const requestUrl = new URL(c.req.url);
-    return `${requestUrl.protocol}//${requestUrl.host}`;
+    const host = new URL(value).hostname.toLowerCase();
+    return host === "gateway.pinata.cloud";
   } catch {
-    return "";
+    return false;
   }
 }
 
-function deploymentProxyUrl(c: any, projectName: string): string {
-  const label = normalizeProjectLabel(projectName);
-  const base = getBackendBaseUrl(c);
-  if (!base) return `/deployments/${label}/`;
-  return `${base}/deployments/${label}/`;
+function preferredGatewayBase(): string {
+  const configured = stripTrailingSlashes(DIRECT_GATEWAY_BASE);
+  if (configured && !isPublicPinataGatewayUrl(configured)) {
+    return configured;
+  }
+  return "https://ipfs.io/ipfs";
 }
 
 function pinataGatewayUrl(cid: string): string {
-  return `https://${PINATA_GATEWAY}/ipfs/${cid}`;
+  return `${preferredGatewayBase()}/${cid}/`;
+}
+
+function rewritePublicPinataUrl(value: string, fallbackCid: string): string {
+  try {
+    const parsed = new URL(value);
+    const match = parsed.pathname.match(/^\/ipfs\/([^/]+)(\/.*)?$/i);
+    const cid = match?.[1] || fallbackCid;
+    const suffix = match?.[2] || "/";
+    return `${preferredGatewayBase()}/${cid}${suffix}`;
+  } catch {
+    return pinataGatewayUrl(fallbackCid);
+  }
+}
+
+function deploymentUrlForRecord(deployment: Deployment): string {
+  const persisted = (deployment.url || "").trim();
+  if (!persisted || persisted.includes("/deployments/")) {
+    return pinataGatewayUrl(deployment.cid);
+  }
+  if (isPublicPinataGatewayUrl(persisted)) {
+    return rewritePublicPinataUrl(persisted, deployment.cid);
+  }
+  return persisted;
 }
 
 const authMiddleware = async (c: any, next: any) => {
@@ -88,7 +97,6 @@ const authMiddleware = async (c: any, next: any) => {
   }
 };
 
-// GET /api/sites - list all domains for the connected wallet
 sitesRouter.get("/", authMiddleware, async (c) => {
   const wallet = getWalletFromRequest(c);
   if (!wallet) {
@@ -100,7 +108,6 @@ sitesRouter.get("/", authMiddleware, async (c) => {
   return c.json({ domains });
 });
 
-// GET /api/sites/:domain - project detail + deployment history
 sitesRouter.get("/:domain", authMiddleware, async (c) => {
   const wallet = getWalletFromRequest(c);
   if (!wallet) {
@@ -127,7 +134,7 @@ sitesRouter.get("/:domain", authMiddleware, async (c) => {
           env: latest.env,
           meta: latest.meta,
           timestamp: latest.timestamp,
-          url: deploymentProxyUrl(c, domain),
+          url: deploymentUrlForRecord(latest),
         }
       : null,
     history: deployments.map((deployment) => ({
@@ -136,12 +143,11 @@ sitesRouter.get("/:domain", authMiddleware, async (c) => {
       env: deployment.env,
       meta: deployment.meta,
       timestamp: deployment.timestamp,
-      url: deploymentProxyUrl(c, domain),
+      url: deploymentUrlForRecord(deployment),
     })),
   });
 });
 
-// DELETE /api/sites/:domain - delete project/deployments and unpin from Pinata
 sitesRouter.delete("/:domain", authMiddleware, async (c) => {
   const wallet = getWalletFromRequest(c);
   if (!wallet) {
@@ -182,7 +188,6 @@ sitesRouter.delete("/:domain", authMiddleware, async (c) => {
   });
 });
 
-// GET /api/sites/:domain/ipns - IPNS-like metadata
 sitesRouter.get("/:domain/ipns", authMiddleware, async (c) => {
   const wallet = getWalletFromRequest(c);
   if (!wallet) {
@@ -197,7 +202,7 @@ sitesRouter.get("/:domain/ipns", authMiddleware, async (c) => {
     return c.json({ error: "No deployments found for this domain" }, 404);
   }
 
-  const siteUrl = deploymentProxyUrl(c, domain);
+  const siteUrl = deploymentUrlForRecord(latest);
   const gatewayUrl = pinataGatewayUrl(latest.cid);
   const deployments = await listDeploymentsByDomain(domain, wallet);
 
@@ -209,16 +214,14 @@ sitesRouter.get("/:domain/ipns", authMiddleware, async (c) => {
     registeredAt: project.createdAt,
     updatedAt: latest.timestamp,
     active: true,
-    gateways: [siteUrl, gatewayUrl],
+    gateways: Array.from(new Set([siteUrl, gatewayUrl])),
     url: siteUrl,
   });
 });
 
-// GET /api/deploy/status - active deploy count
 export function deployStatusHandler(c: any) {
   return c.json({
     active: getActiveDeployCount(),
     max: getMaxConcurrent(),
   });
 }
-

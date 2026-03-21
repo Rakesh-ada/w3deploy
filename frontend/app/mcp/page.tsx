@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Navbar from "@/components/navbar";
 
+const MCP_WALKTHROUGH_URL = "https://youtu.be/bf5vnTr1Sz0?si=qxrd3ytSfnMnMp_u";
+
 const MCP_CONFIG = `{
   "preferences": {
     "coworkWebSearchEnabled": true,
@@ -109,8 +111,42 @@ function SyntaxLine({ line }: { line: string }) {
   );
 }
 
+function toYouTubeEmbedUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+
+    if (host === "youtu.be") {
+      const id = parsed.pathname.replace(/^\/+/, "").split("/")[0];
+      if (id) return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+    }
+
+    if (host.endsWith("youtube.com")) {
+      if (parsed.pathname === "/watch") {
+        const id = parsed.searchParams.get("v");
+        if (id) return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+      }
+
+      if (parsed.pathname.startsWith("/embed/")) {
+        const id = parsed.pathname.split("/")[2];
+        if (id) return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+      }
+
+      if (parsed.pathname.startsWith("/shorts/")) {
+        const id = parsed.pathname.split("/")[2];
+        if (id) return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+      }
+    }
+  } catch {
+    // Fallback below for malformed URLs.
+  }
+
+  return "https://www.youtube.com/embed/bf5vnTr1Sz0?rel=0&modestbranding=1";
+}
+
 export default function McpPage() {
   const [copied, setCopied] = useState(false);
+  const walkthroughEmbedUrl = toYouTubeEmbedUrl(MCP_WALKTHROUGH_URL);
 
   function handleCopy() {
     navigator.clipboard.writeText(MCP_CONFIG).then(() => {
@@ -183,7 +219,7 @@ export default function McpPage() {
             {/* Footer */}
             <div className="px-6 py-4 border-t border-white/5">
               <p className="text-tg-muted text-xs">
-                🔒 Keep tokens and private keys in local config only. Never commit real credentials to source control.
+                Keep tokens and private keys in local config only. Never commit real credentials to source control.
               </p>
             </div>
           </div>
@@ -205,13 +241,21 @@ export default function McpPage() {
                 <div className="rounded-2xl bg-black/60 border border-white/5 overflow-hidden aspect-video flex items-center justify-center">
                   <iframe
                     className="w-full h-full object-cover"
-                    src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-                    title="YouTube video player"
+                    src={walkthroughEmbedUrl}
+                    title="W3DEPLOY MCP setup walkthrough"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
                 </div>
+                <a
+                  href={MCP_WALKTHROUGH_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex mt-4 text-xs font-semibold text-tg-lavender hover:text-tg-lime transition-colors"
+                >
+                  Watch on YouTube
+                </a>
               </div>
             </div>
 

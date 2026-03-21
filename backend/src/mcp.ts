@@ -2,13 +2,12 @@ import fs from "fs/promises";
 import os from "os";
 import path from "path";
 import crypto from "crypto";
+import { spawn } from "child_process";
 import algosdk from "algosdk";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
 import { PinataSDK } from "pinata-web3";
 import { verifyMessage } from "ethers";
-import * as tar from "tar";
-import { encryptBuffer } from "./crypto.js";
 import {
   addDeployment,
   canStartDeploy,
@@ -22,12 +21,14 @@ import {
 
 const JWT_SECRET = process.env.JWT_SECRET || "w3deploy-super-secret-key-change-me";
 const PINATA_GATEWAY = process.env.PINATA_GATEWAY || "gateway.pinata.cloud";
-const BACKEND_URL = process.env.BACKEND_URL || "";
+const DIRECT_GATEWAY_BASE = (process.env.DIRECT_GATEWAY_BASE || `https://${PINATA_GATEWAY}/ipfs`).trim();
+const DIRECT_GATEWAY_BASES = (process.env.DIRECT_GATEWAY_BASES || "").trim();
 const TEMP_ROOT = path.join(os.tmpdir(), "w3deploy", "mcp");
 const MAX_FILES = 1000;
 const MAX_PATH_LENGTH = 200;
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 const CHALLENGE_TTL_MS = 5 * 60 * 1000;
+const BUILD_OUTPUT_CANDIDATES = ["dist", "out", "build", ".next/static", ".next"] as const;
 
 const EVM_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
@@ -58,6 +59,8 @@ type DeployCodeBody = {
   challengeSignature?: unknown;
 };
 
+type FileWithWebkitPath = File & { webkitRelativePath?: string };
+
 export const mcpRouter = new Hono();
 
 function getErrorMessage(error: unknown): string {
@@ -79,31 +82,6 @@ function normalizeProjectLabel(value: string): string {
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "");
   return normalized || "project";
-}
-
-function resolveProxyBaseUrl(requestUrl?: string): string {
-  const configured = BACKEND_URL.trim();
-  if (configured) {
-    return stripTrailingSlashes(configured);
-  }
-
-  if (requestUrl) {
-    try {
-      const parsed = new URL(requestUrl);
-      return `${parsed.protocol}//${parsed.host}`;
-    } catch {
-      // Ignore malformed request URLs and fall back to relative paths.
-    }
-  }
-
-  return "";
-}
-
-function buildDeploymentProxyUrl(projectName: string, requestUrl?: string): string {
-  const projectLabel = normalizeProjectLabel(projectName);
-  const base = resolveProxyBaseUrl(requestUrl);
-  if (!base) return `/deployments/${projectLabel}/`;
-  return `${base}/deployments/${projectLabel}/`;
 }
 
 function normalizeWalletAddress(value: string): string {
@@ -233,10 +211,24 @@ function validateChallengeOwnership(
   return { ok: true };
 }
 
-function parseMetaSafe(raw: unknown): { notes?: string; env?: string } {
+function parseMetaSafe(raw: unknown): {
+  notes?: string;
+  env?: string;
+  rootDirectory?: string;
+  installCommand?: string;
+  buildCommand?: string;
+  outputDirectory?: string;
+} {
   if (typeof raw === "string" && raw.trim()) {
     try {
-      return JSON.parse(raw) as { notes?: string; env?: string };
+      return JSON.parse(raw) as {
+        notes?: string;
+        env?: string;
+        rootDirectory?: string;
+        installCommand?: string;
+        buildCommand?: string;
+        outputDirectory?: string;
+      };
     } catch {
       return { notes: raw };
     }
@@ -247,10 +239,182 @@ function parseMetaSafe(raw: unknown): { notes?: string; env?: string } {
     return {
       notes: typeof obj.notes === "string" ? obj.notes : undefined,
       env: typeof obj.env === "string" ? obj.env : undefined,
+      rootDirectory: typeof (obj as { rootDirectory?: unknown }).rootDirectory === "string"
+        ? (obj as { rootDirectory?: string }).rootDirectory
+        : undefined,
+      installCommand: typeof (obj as { installCommand?: unknown }).installCommand === "string"
+        ? (obj as { installCommand?: string }).installCommand
+        : undefined,
+      buildCommand: typeof (obj as { buildCommand?: unknown }).buildCommand === "string"
+        ? (obj as { buildCommand?: string }).buildCommand
+        : undefined,
+      outputDirectory: typeof (obj as { outputDirectory?: unknown }).outputDirectory === "string"
+        ? (obj as { outputDirectory?: string }).outputDirectory
+        : undefined,
     };
   }
 
   return {};
+}
+
+function commandExistsInPath(command: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const check = process.platform === "win32" ? `where ${command}` : `command -v ${command}`;
+    const child = spawn(check, { shell: true, stdio: "ignore" });
+    child.on("close", (code) => resolve(code === 0));
+    child.on("error", () => resolve(false));
+  });
+}
+
+function runShellCommand(command: string, cwd: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, {
+      cwd,
+      stdio: ["ignore", "pipe", "pipe"],
+      shell: true,
+    });
+
+    let stderr = "";
+    child.stderr?.on("data", (chunk: Buffer) => {
+      stderr += chunk.toString();
+    });
+
+    child.on("error", (error) => reject(error));
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+        return;
+      }
+
+      const tail = stderr.trim().slice(-500);
+      reject(new Error(`Command failed (${command}) with exit code ${code}${tail ? `: ${tail}` : ""}`));
+    });
+  });
+}
+
+async function pathExists(pathname: string): Promise<boolean> {
+  try {
+    await fs.stat(pathname);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveProjectDirectory(baseDir: string, rootDirectory?: string): Promise<string> {
+  const rootDir = (rootDirectory || "").trim().replace(/^\.?\/?/, "").replace(/\/+$/, "");
+
+  if (rootDir && rootDir !== ".") {
+    const explicitDir = path.join(baseDir, rootDir);
+    if (!(await pathExists(explicitDir))) {
+      throw new Error(`Root directory "${rootDirectory}" not found in deploy payload.`);
+    }
+    return explicitDir;
+  }
+
+  if (await pathExists(path.join(baseDir, "package.json"))) {
+    return baseDir;
+  }
+
+  const entries = await fs.readdir(baseDir, { withFileTypes: true });
+  const candidates: string[] = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name === ".git" || entry.name === "node_modules") continue;
+
+    const candidateDir = path.join(baseDir, entry.name);
+    if (await pathExists(path.join(candidateDir, "package.json"))) {
+      candidates.push(candidateDir);
+    }
+  }
+
+  if (candidates.length === 1) {
+    return candidates[0];
+  }
+
+  return baseDir;
+}
+
+async function detectBuildOutputDirectory(projectDir: string, customOutput?: string): Promise<string> {
+  if (customOutput && customOutput.trim()) {
+    const customPath = path.join(projectDir, customOutput.trim());
+    try {
+      const stats = await fs.stat(customPath);
+      if (stats.isDirectory()) return customPath;
+    } catch {
+      // Fall through to auto-detect candidates.
+    }
+  }
+
+  for (const candidate of BUILD_OUTPUT_CANDIDATES) {
+    const candidatePath = path.join(projectDir, candidate);
+    try {
+      const stats = await fs.stat(candidatePath);
+      if (stats.isDirectory()) return candidatePath;
+    } catch {
+      // Keep scanning.
+    }
+  }
+
+  return projectDir;
+}
+
+async function detectPackageManager(projectDir: string): Promise<"npm" | "pnpm" | "yarn" | "bun"> {
+  try {
+    await fs.stat(path.join(projectDir, "pnpm-lock.yaml"));
+    if (await commandExistsInPath("pnpm")) return "pnpm";
+  } catch {}
+
+  try {
+    await fs.stat(path.join(projectDir, "yarn.lock"));
+    if (await commandExistsInPath("yarn")) return "yarn";
+  } catch {}
+
+  try {
+    await fs.stat(path.join(projectDir, "bun.lockb"));
+    if (await commandExistsInPath("bun")) return "bun";
+  } catch {}
+
+  try {
+    await fs.stat(path.join(projectDir, "bun.lock"));
+    if (await commandExistsInPath("bun")) return "bun";
+  } catch {}
+
+  return "npm";
+}
+
+async function prepareStaticOutput(projectDir: string, meta: { installCommand?: string; buildCommand?: string; outputDirectory?: string }): Promise<string> {
+  const packageJsonPath = path.join(projectDir, "package.json");
+
+  try {
+    await fs.stat(packageJsonPath);
+  } catch {
+    return detectBuildOutputDirectory(projectDir, meta.outputDirectory);
+  }
+
+  const packageManager = await detectPackageManager(projectDir);
+  const defaultInstallCommand =
+    packageManager === "pnpm"
+      ? "pnpm install --frozen-lockfile"
+      : packageManager === "yarn"
+      ? "yarn install --frozen-lockfile"
+      : packageManager === "bun"
+      ? "bun install"
+      : "npm install --no-fund --no-audit";
+
+  const defaultBuildCommand =
+    packageManager === "pnpm"
+      ? "pnpm run build"
+      : packageManager === "yarn"
+      ? "yarn build"
+      : packageManager === "bun"
+      ? "bun run build"
+      : "npm run build";
+
+  await runShellCommand((meta.installCommand || defaultInstallCommand).trim(), projectDir);
+  await runShellCommand((meta.buildCommand || defaultBuildCommand).trim(), projectDir);
+
+  return detectBuildOutputDirectory(projectDir, meta.outputDirectory);
 }
 
 function validateAndNormalizeFiles(input: unknown): Array<{ path: string; content: string }> {
@@ -312,6 +476,168 @@ async function writeAgentFiles(rootDir: string, files: Array<{ path: string; con
   }
 }
 
+function toPosixPath(value: string): string {
+  return value.replace(/\\/g, "/");
+}
+
+async function collectOutputFilesForPinata(outputDir: string, rootFolderName: string): Promise<File[]> {
+  const files: File[] = [];
+  const normalizedRootFolder = normalizeProjectLabel(rootFolderName || "site");
+
+  async function walk(currentDir: string): Promise<void> {
+    const entries = await fs.readdir(currentDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const absolutePath = path.join(currentDir, entry.name);
+
+      if (entry.isDirectory()) {
+        await walk(absolutePath);
+        continue;
+      }
+
+      if (!entry.isFile()) {
+        continue;
+      }
+
+      const relativePath = toPosixPath(path.relative(outputDir, absolutePath));
+      if (!relativePath || relativePath.startsWith("..")) {
+        continue;
+      }
+
+      const content = await fs.readFile(absolutePath);
+      const uploadPath = `${normalizedRootFolder}/${relativePath}`;
+      const file = new File([new Uint8Array(content)], path.basename(relativePath), {
+        type: "application/octet-stream",
+      }) as FileWithWebkitPath;
+
+      Object.defineProperty(file, "webkitRelativePath", {
+        value: uploadPath,
+        configurable: true,
+      });
+
+      files.push(file);
+    }
+  }
+
+  await walk(outputDir);
+
+  if (files.length === 0) {
+    throw new Error("No files found in deploy payload.");
+  }
+
+  return files;
+}
+
+function buildDirectGatewayFolderUrl(cid: string, folderPath = ""): string {
+  const base = stripTrailingSlashes(DIRECT_GATEWAY_BASE);
+  const suffix = folderPath ? `${folderPath.replace(/^\/+|\/+$/g, "")}/` : "";
+  return `${base}/${cid}/${suffix}`;
+}
+
+function isPublicPinataGateway(baseUrl: string): boolean {
+  try {
+    const host = new URL(baseUrl).hostname.toLowerCase();
+    return host === "gateway.pinata.cloud";
+  } catch {
+    return false;
+  }
+}
+
+function buildGatewayBaseCandidates(): string[] {
+  const configuredList = DIRECT_GATEWAY_BASES
+    ? DIRECT_GATEWAY_BASES.split(",").map((value) => value.trim()).filter(Boolean)
+    : [];
+
+  const defaults = ["https://ipfs.io/ipfs", DIRECT_GATEWAY_BASE, "https://dweb.link/ipfs"];
+  const unique = new Set<string>();
+
+  for (const candidate of [...configuredList, ...defaults]) {
+    const normalized = stripTrailingSlashes(candidate);
+    if (!normalized) continue;
+    if (isPublicPinataGateway(normalized)) continue;
+    unique.add(normalized);
+  }
+
+  return [...unique];
+}
+
+async function isGatewayPathReachable(url: string): Promise<boolean> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const headResponse = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: controller.signal,
+    });
+
+    if (headResponse.ok) {
+      return true;
+    }
+
+    if (headResponse.status !== 405) {
+      return false;
+    }
+  } catch {
+    // Fall back to lightweight GET probe below.
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  const getController = new AbortController();
+  const getTimeout = setTimeout(() => getController.abort(), 7000);
+  try {
+    const getResponse = await fetch(url, {
+      method: "GET",
+      redirect: "follow",
+      headers: { Range: "bytes=0-2048" },
+      signal: getController.signal,
+    });
+
+    if (!getResponse.ok) {
+      return false;
+    }
+
+    const contentType = (getResponse.headers.get("content-type") || "").toLowerCase();
+    if (contentType.includes("text") || contentType.includes("html") || contentType.includes("json")) {
+      const sample = (await getResponse.text()).toLowerCase();
+      if (
+        sample.includes("html content cannot be served through the pinata public gateway") ||
+        sample.includes("err_id:00023")
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(getTimeout);
+  }
+}
+
+async function resolveDirectSiteUrl(cid: string, rootFolderName: string): Promise<string> {
+  const rootPath = normalizeProjectLabel(rootFolderName || "site");
+
+  const gatewayBases = buildGatewayBaseCandidates();
+  const candidates: string[] = [];
+
+  for (const base of gatewayBases) {
+    candidates.push(`${base}/${cid}/`);
+    candidates.push(`${base}/${cid}/${rootPath}/`);
+  }
+
+  for (const candidate of candidates) {
+    if (await isGatewayPathReachable(candidate)) {
+      return candidate;
+    }
+  }
+
+  return `https://ipfs.io/ipfs/${cid}/`;
+}
+
 const authMiddleware = async (c: any, next: any) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader) return c.json({ error: "Unauthorized" }, 401);
@@ -325,7 +651,6 @@ const authMiddleware = async (c: any, next: any) => {
   }
 };
 
-// MCP Setup / Auth Endpoint
 mcpRouter.post("/connect", async (c) => {
   const { ide, workspace } = await c.req.json().catch(() => ({ ide: "unknown", workspace: "unknown" }));
   return c.json({
@@ -337,7 +662,6 @@ mcpRouter.post("/connect", async (c) => {
   });
 });
 
-// Create a one-time challenge message that must be signed by the user's wallet.
 mcpRouter.post("/challenge", authMiddleware, async (c) => {
   const walletAddress = getWalletFromRequest(c);
   if (!walletAddress) {
@@ -370,7 +694,6 @@ mcpRouter.post("/challenge", authMiddleware, async (c) => {
   });
 });
 
-// Deploy code sent directly from an agent/IDE via MCP
 mcpRouter.post("/deploy-code", authMiddleware, async (c) => {
   const walletAddress = getWalletFromRequest(c);
   if (!walletAddress) {
@@ -411,33 +734,29 @@ mcpRouter.post("/deploy-code", authMiddleware, async (c) => {
     await fs.mkdir(tempDir, { recursive: true });
     await writeAgentFiles(tempDir, files);
 
-    const tarballPath = path.join(tempDir, "site.tar.gz");
-    await tar.c(
-      {
-        cwd: tempDir,
-        file: tarballPath,
-        gzip: true,
+    const projectDir = await resolveProjectDirectory(tempDir, meta.rootDirectory);
+
+    const outputDir = await prepareStaticOutput(projectDir, {
+      installCommand: meta.installCommand,
+      buildCommand: meta.buildCommand,
+      outputDirectory: meta.outputDirectory,
+    });
+
+    const uploadRootFolder = normalizeProjectLabel(label || "site");
+    const pinataFiles = await collectOutputFilesForPinata(outputDir, uploadRootFolder);
+    const uploadResult = await pinata.upload.fileArray(pinataFiles, {
+      metadata: {
+        name: `w3deploy-${label}-${Date.now()}`,
       },
-      ["."]
-    );
+      cidVersion: 1,
+    });
 
-    const tarBuffer = await fs.readFile(tarballPath);
-    const encryptedBuffer = encryptBuffer(tarBuffer);
-
-    const uploadFile = new File(
-      [new Uint8Array(encryptedBuffer)],
-      `w3deploy-${label}-${Date.now()}.enc`,
-      { type: "application/octet-stream" }
-    );
-
-    const uploadResult = await pinata.upload.file(uploadFile);
     const cid = uploadResult.IpfsHash;
     if (!cid) {
       throw new Error("Upload completed without an IPFS CID.");
     }
 
-    const siteUrl = buildDeploymentProxyUrl(label, c.req.url);
-    const gatewayUrl = `https://${PINATA_GATEWAY}/ipfs/${cid}`;
+    const siteUrl = await resolveDirectSiteUrl(cid, uploadRootFolder);
 
     const project = await upsertProject(label, walletAddress, {
       repoFullName: "agent://mcp",
@@ -470,7 +789,7 @@ mcpRouter.post("/deploy-code", authMiddleware, async (c) => {
       cid,
       url: siteUrl,
       gatewayUrl: siteUrl,
-      rawGatewayUrl: gatewayUrl,
+      rawGatewayUrl: siteUrl,
       files: files.length,
       activeDeploys: getActiveDeployCount(),
       maxDeploys: getMaxConcurrent(),
@@ -484,7 +803,6 @@ mcpRouter.post("/deploy-code", authMiddleware, async (c) => {
   }
 });
 
-// Minimal status endpoint for MCP clients
 mcpRouter.get("/status", (c) => {
   return c.json({
     active: getActiveDeployCount(),

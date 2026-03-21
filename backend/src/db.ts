@@ -98,6 +98,7 @@ let adminAccount: algosdk.Account | null = null;
 let cachedDb: Database = cloneDb(EMPTY_DB);
 let cachedAt = 0;
 let loadPromise: Promise<Database> | null = null;
+let indexerWarningShown = false;
 
 const activeDeployState = {
   active: 0,
@@ -314,6 +315,13 @@ function decodeTransactionNote(note: unknown): string | null {
   return null;
 }
 
+function describeError(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return String(error);
+}
+
 async function fetchChainEvents(): Promise<ChainEvent[]> {
   if (!adminAccount) {
     return [];
@@ -384,7 +392,37 @@ async function loadDb(force = false): Promise<Database> {
 
   loadPromise = (async () => {
     const nextDb = cloneDb(EMPTY_DB);
-    const events = await fetchChainEvents();
+    let events: ChainEvent[] = [];
+
+    try {
+      events = await fetchChainEvents();
+    } catch (error) {
+      const errorMessage = describeError(error);
+
+      // Keep API reads available even if the indexer is temporarily unreachable.
+      if (cachedAt > 0) {
+        if (!indexerWarningShown) {
+          console.warn(
+            `Algorand indexer unreachable (${errorMessage}). Serving last known cache until connectivity recovers.`
+          );
+          indexerWarningShown = true;
+        }
+        return cloneDb(cachedDb);
+      }
+
+      if (!indexerWarningShown) {
+        console.warn(
+          `Algorand indexer unreachable (${errorMessage}). Using empty cache until connectivity recovers.`
+        );
+        indexerWarningShown = true;
+      }
+
+      cachedDb = cloneDb(EMPTY_DB);
+      cachedAt = Date.now();
+      return cloneDb(cachedDb);
+    }
+
+    indexerWarningShown = false;
 
     for (const event of events) {
       applyEvent(nextDb, event);
@@ -456,7 +494,7 @@ export async function ensureDatabase(): Promise<void> {
     await loadDb(true);
     console.log(`Algorand storage connected via ${INDEXER_SERVER}`);
   } catch (error) {
-    console.error("Failed to hydrate cache from Algorand indexer:", error);
+    console.warn(`Failed to hydrate cache from Algorand indexer: ${describeError(error)}`);
   }
 }
 
