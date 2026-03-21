@@ -125,7 +125,7 @@ const presetVariants: Record<PresetType, { container: Variants; item: Variants }
       visible: {
         opacity: 1,
         scale: 1,
-        transition: { type: "spring", stiffness: 300, damping: 20 },
+        transition: { type: "spring" as const, stiffness: 300, damping: 20 },
       },
     },
   },
@@ -136,7 +136,7 @@ const presetVariants: Record<PresetType, { container: Variants; item: Variants }
       visible: {
         opacity: 1,
         rotateX: 0,
-        transition: { type: "spring", stiffness: 300, damping: 20 },
+        transition: { type: "spring" as const, stiffness: 300, damping: 20 },
       },
     },
   },
@@ -147,7 +147,7 @@ const presetVariants: Record<PresetType, { container: Variants; item: Variants }
       visible: {
         opacity: 1,
         y: 0,
-        transition: { type: "spring", stiffness: 400, damping: 10 },
+        transition: { type: "spring" as const, stiffness: 400, damping: 10 },
       },
     },
   },
@@ -158,7 +158,7 @@ const presetVariants: Record<PresetType, { container: Variants; item: Variants }
       visible: {
         opacity: 1,
         rotate: 0,
-        transition: { type: "spring", stiffness: 200, damping: 15 },
+        transition: { type: "spring" as const, stiffness: 200, damping: 15 },
       },
     },
   },
@@ -169,7 +169,7 @@ const presetVariants: Record<PresetType, { container: Variants; item: Variants }
       visible: {
         opacity: 1,
         rotate: 0,
-        transition: { type: "spring", stiffness: 300, damping: 8 },
+        transition: { type: "spring" as const, stiffness: 300, damping: 8 },
       },
     },
   },
@@ -312,7 +312,7 @@ const transitionVariants = {
       filter: "blur(0px)",
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         bounce: 0.3,
         duration: 1.5,
       },
@@ -357,7 +357,7 @@ export function ModernDarkHeroSection() {
                     opacity: 1,
                     y: 0,
                     transition: {
-                      type: "spring",
+                      type: "spring" as const,
                       bounce: 0.3,
                       duration: 2,
                     },
@@ -981,7 +981,7 @@ export function ModernDarkHeroSection() {
                   <path d="M4.5 16.5c-1.5 1.5-1.5 3.5 0 5s3.5 1.5 5 0l3.5-3.5c1.5-1.5 1.5-3.5 0-5s-3.5-1.5-5 0l-.5.5" />
                   <path d="M19.5 7.5c1.5-1.5 1.5-3.5 0-5s-3.5-1.5-5 0L11 6c-1.5 1.5-1.5 3.5 0 5s3.5 1.5 5 0l.5-.5" />
                 </svg>
-                <span className="text-sm font-semibold text-purple-400 uppercase tracking-wider">🧭 DEPLOYMENT OPTIONS</span>
+                <span className="text-sm font-semibold text-purple-400 uppercase tracking-wider">DEPLOYMENT OPTIONS</span>
               </div>
 
               {/* Heading */}
@@ -1481,193 +1481,172 @@ export function ModernDarkHeroSection() {
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white whitespace-nowrap">
                 Trusted by{" "}
                 <span className="bg-gradient-to-r from-indigo-500 to-teal-400 bg-clip-text text-transparent">
-                  developers
+                  developers & Teams
                 </span>
               </h2>
 
               {/* Subheading */}
               <p className="text-lg text-zinc-400 max-w-2xl text-balance">
-                See what developers are saying about their experience with AlgoFlow's decentralized deployment platform.
+                Real feedback from developers and teams deploying faster, staying live, and owning their infrastructure with W3Deploy.
               </p>
             </div>
 
-            {/* Testimonials Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Testimonial 1 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
+            {/* Animated Testimonials Carousel */}
+            <div className="relative overflow-hidden w-full py-4">
+              {/* Gradients for fade effect on edges */}
+              <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0A0A0A] to-transparent z-10 pointer-events-none" />
+              
+              <div
+                className="flex animate-marquee"
+                style={{
+                  width: "max-content",
+                }}
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
-                    S
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Sarah Chen</h4>
-                    <p className="text-sm text-zinc-400">Frontend Developer</p>
-                  </div>
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  "AlgoFlow made deploying to IPFS incredibly simple. What used to take hours of configuration now happens with a single push to GitHub. The ENS integration is seamless."
-                </p>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
+                {/* First set of testimonials */}
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Sarah Chen",
+                    role: "Frontend Developer",
+                    avatar: "S",
+                    gradient: "from-blue-500 to-purple-600",
+                    feedback: "AlgoFlow made deploying to IPFS incredibly simple. What used to take hours of configuration now happens with a single push to GitHub. The ENS integration is seamless.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Marcus Rodriguez",
+                    role: "Full Stack Developer", 
+                    avatar: "M",
+                    gradient: "from-green-500 to-teal-600",
+                    feedback: "The MCP integration is a game-changer. I can deploy directly from my IDE with AI assistance. The automatic pinning and fallback systems give me confidence in production.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Alex Thompson",
+                    role: "DevOps Engineer",
+                    avatar: "A", 
+                    gradient: "from-pink-500 to-red-600",
+                    feedback: "Finally, a deployment platform that truly understands decentralization. The GitHub Actions integration works flawlessly, and the deployment history is incredibly detailed.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Lisa Park",
+                    role: "Web3 Developer",
+                    avatar: "L",
+                    gradient: "from-orange-500 to-yellow-600", 
+                    feedback: "The ENS dashboard makes managing custom domains effortless. IPNS updates happen automatically, and the whole process is transparent and reliable.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "David Kim",
+                    role: "Startup Founder",
+                    avatar: "D",
+                    gradient: "from-indigo-500 to-blue-600",
+                    feedback: "AlgoFlow eliminated our hosting costs and censorship concerns. Our dApp is truly unstoppable now, and the deployment process is faster than traditional hosting.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Rachel Green", 
+                    role: "Product Manager",
+                    avatar: "R",
+                    gradient: "from-purple-500 to-pink-600",
+                    feedback: "The team loves how simple it is to deploy. No more complex server configurations or vendor lock-in. AlgoFlow just works, and our sites are always available.",
+                    rating: 5
+                  }}
+                />
 
-              {/* Testimonial 2 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg">
-                    M
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Marcus Rodriguez</h4>
-                    <p className="text-sm text-zinc-400">Full Stack Developer</p>
-                  </div>
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  "The MCP integration is a game-changer. I can deploy directly from my IDE with AI assistance. The automatic pinning and fallback systems give me confidence in production."
-                </p>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Testimonial 3 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-red-600 flex items-center justify-center text-white font-bold text-lg">
-                    A
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Alex Thompson</h4>
-                    <p className="text-sm text-zinc-400">DevOps Engineer</p>
-                  </div>
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  "Finally, a deployment platform that truly understands decentralization. The GitHub Actions integration works flawlessly, and the deployment history is incredibly detailed."
-                </p>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Testimonial 4 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-yellow-600 flex items-center justify-center text-white font-bold text-lg">
-                    L
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Lisa Park</h4>
-                    <p className="text-sm text-zinc-400">Web3 Developer</p>
-                  </div>
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  "The ENS dashboard makes managing custom domains effortless. IPNS updates happen automatically, and the whole process is transparent and reliable."
-                </p>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Testimonial 5 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg">
-                    D
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">David Kim</h4>
-                    <p className="text-sm text-zinc-400">Startup Founder</p>
-                  </div>
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  "AlgoFlow eliminated our hosting costs and censorship concerns. Our dApp is truly unstoppable now, and the deployment process is faster than traditional hosting."
-                </p>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Testimonial 6 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                viewport={{ once: true }}
-                className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 space-y-6"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold text-lg">
-                    R
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">Rachel Green</h4>
-                    <p className="text-sm text-zinc-400">Product Manager</p>
-                  </div>
-                </div>
-                <p className="text-zinc-300 leading-relaxed">
-                  "The team loves how simple it is to deploy. No more complex server configurations or vendor lock-in. AlgoFlow just works, and our sites are always available."
-                </p>
-                <div className="flex space-x-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg key={star} className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                    </svg>
-                  ))}
-                </div>
-              </motion.div>
+                {/* Second set of testimonials (duplicate for seamless loop) */}
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Sarah Chen",
+                    role: "Frontend Developer",
+                    avatar: "S",
+                    gradient: "from-blue-500 to-purple-600",
+                    feedback: "AlgoFlow made deploying to IPFS incredibly simple. What used to take hours of configuration now happens with a single push to GitHub. The ENS integration is seamless.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Marcus Rodriguez",
+                    role: "Full Stack Developer", 
+                    avatar: "M",
+                    gradient: "from-green-500 to-teal-600",
+                    feedback: "The MCP integration is a game-changer. I can deploy directly from my IDE with AI assistance. The automatic pinning and fallback systems give me confidence in production.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Alex Thompson",
+                    role: "DevOps Engineer",
+                    avatar: "A", 
+                    gradient: "from-pink-500 to-red-600",
+                    feedback: "Finally, a deployment platform that truly understands decentralization. The GitHub Actions integration works flawlessly, and the deployment history is incredibly detailed.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Lisa Park",
+                    role: "Web3 Developer",
+                    avatar: "L",
+                    gradient: "from-orange-500 to-yellow-600", 
+                    feedback: "The ENS dashboard makes managing custom domains effortless. IPNS updates happen automatically, and the whole process is transparent and reliable.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "David Kim",
+                    role: "Startup Founder",
+                    avatar: "D",
+                    gradient: "from-indigo-500 to-blue-600",
+                    feedback: "AlgoFlow eliminated our hosting costs and censorship concerns. Our dApp is truly unstoppable now, and the deployment process is faster than traditional hosting.",
+                    rating: 5
+                  }}
+                />
+                <TestimonialCard 
+                  testimonial={{
+                    name: "Rachel Green", 
+                    role: "Product Manager",
+                    avatar: "R",
+                    gradient: "from-purple-500 to-pink-600",
+                    feedback: "The team loves how simple it is to deploy. No more complex server configurations or vendor lock-in. AlgoFlow just works, and our sites are always available.",
+                    rating: 5
+                  }}
+                />
+              </div>
             </div>
           </div>
+
+          {/* CSS Animation Styles */}
+          <style jsx global>{`
+            @keyframes marquee {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
+            }
+            .animate-marquee {
+              animation: marquee 30s linear infinite;
+            }
+            .animate-marquee:hover {
+              animation-play-state: paused;
+            }
+          `}</style>
         </section>
 
         {/* Glossy Purple CTA Section */}
@@ -1782,6 +1761,52 @@ export function ModernDarkHeroSection() {
         </footer>
       </main>
     </>
+  );
+}
+
+// TestimonialCard Component
+function TestimonialCard({ testimonial }: { testimonial: any }) {
+  return (
+    <div className="px-4 flex-shrink-0" style={{ width: "450px" }}>
+      <div className="relative group transition-all duration-500 h-full border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900/70 hover:border-purple-500/30 rounded-3xl overflow-hidden backdrop-blur-sm p-8 space-y-6" style={{ minHeight: "280px" }}>
+        <div className="absolute top-0 right-0 p-6 text-zinc-700 group-hover:text-purple-500/20 transition-colors">
+          <svg className="w-12 h-12 rotate-180" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+          </svg>
+        </div>
+
+        <div className="flex items-center space-x-4 relative z-10">
+          <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${testimonial.gradient} flex items-center justify-center text-white font-bold text-lg`}>
+            {testimonial.avatar}
+          </div>
+          <div>
+            <h4 className="font-bold text-white text-lg tracking-tight">{testimonial.name}</h4>
+            <p className="text-xs font-medium uppercase tracking-widest text-purple-400/70">{testimonial.role}</p>
+          </div>
+        </div>
+
+        <p className="text-zinc-300 text-base leading-relaxed text-pretty flex-grow group-hover:text-zinc-200 transition-colors italic relative z-10">
+          &quot;{testimonial.feedback}&quot;
+        </p>
+
+        <div className="flex justify-between items-center mt-auto pt-6 border-t border-zinc-800 relative z-10">
+          <div className="flex space-x-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <svg
+                key={star}
+                className={`h-4 w-4 ${star <= (testimonial.rating || 5) ? "fill-yellow-400 text-yellow-400" : "fill-none text-zinc-600"}`}
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            ))}
+          </div>
+          <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-zinc-800/50 text-zinc-400 border border-zinc-700 group-hover:border-purple-500/30 group-hover:text-purple-400 transition-all">
+            Developer
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }
 
